@@ -1,0 +1,445 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./bingooo.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Customer {
+  id                   String            @id @default(uuid())
+  email                String?           @unique // Customer login email
+  phoneNumber          String?           @unique // Optional phone
+  visitorId            String?           @unique
+  displayName          String?
+  isVerified           Boolean           @default(true)
+  marketingConsent     Boolean           @default(false)
+  marketingConsentAt   DateTime?
+  privacyNoticeVersion String            @default("1.0")
+  loyaltyEnrollmentAt  DateTime?         @default(now())
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  
+  profile              CustomerProfile?
+  loyaltyAccount       LoyaltyAccount?
+  referralCode         ReferralCode?
+  referralsMade        Referral[]        @relation("ReferrerRelation")
+  referralReceived     Referral?         @relation("ReferredRelation")
+  otpChallenges        OtpChallenge[]
+  customerSessions     CustomerSession[]
+  spins                Spin[]
+  rewards              Reward[]
+  storeCheckIns        StoreCheckIn[]
+  purchases            Purchase[]
+  birthdayClaims       BirthdayRewardClaim[]
+  loyaltyRedemptions   LoyaltyRedemption[]
+
+  @@index([email])
+  @@index([phoneNumber])
+}
+
+model CustomerProfile {
+  id                        String    @id @default(uuid())
+  customerId                String    @unique
+  customer                  Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  birthMonth                Int?      // 1 - 12
+  birthDay                  Int?      // 1 - 31
+  birthYear                 Int?
+  birthdayOptInAt           DateTime?
+  birthdayUpdatedAt         DateTime?
+  preferredClothingCategory String?   // Shirts, T-Shirts, Jeans, Trousers
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+}
+
+model OtpChallenge {
+  id          String    @id @default(uuid())
+  customerId  String
+  customer    Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  phoneNumber String
+  codeHash    String
+  expiresAt   DateTime
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(5)
+  isConsumed  Boolean   @default(false)
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+
+  @@index([phoneNumber, createdAt])
+}
+
+model CustomerSession {
+  id         String    @id @default(uuid())
+  customerId String
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime  @default(now())
+
+  @@index([customerId])
+}
+
+model AdminUser {
+  id           String        @id @default(uuid())
+  username     String        @unique
+  email        String        @unique
+  name         String
+  passwordHash String
+  role         String        @default("STAFF") // SUPER_ADMIN, MANAGER, STAFF
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  auditLogs    AuditLog[]
+  redemptions  Redemption[]
+  verifiedPurchases Purchase[]
+  verifiedCheckIns  StoreCheckIn[]
+  createdChallenges QrChallenge[]
+  rewardRulesUpdated RewardRule[]
+}
+
+model Campaign {
+  id          String    @id @default(uuid())
+  name        String
+  periodKey   String    @unique // e.g. "2026-11"
+  startsAt    DateTime
+  endsAt      DateTime
+  isActive    Boolean   @default(true)
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  spins       Spin[]
+  rewards     Reward[]
+}
+
+model Prize {
+  id            String          @id @default(uuid())
+  type          String          // DISCOUNT_20, DISCOUNT_10, DISCOUNT_5, FREE_GIFT, NO_PRIZE
+  name          String
+  description   String
+  weight        Int             // Probability weight
+  basisPoints   Int             @default(1000)
+  isActive      Boolean         @default(true)
+  displayOrder  Int             @default(0)
+  color         String          @default("#C91F32")
+  textColor     String          @default("#FFFFFF")
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  spins         Spin[]
+  rewards       Reward[]
+  giftInventory GiftInventory?
+}
+
+model PrizeConfigurationVersion {
+  id          String   @id @default(uuid())
+  version     Int      @default(1)
+  snapshot    String   // JSON string
+  appliedBy   String?
+  createdAt   DateTime @default(now())
+}
+
+model GiftInventory {
+  id            String    @id @default(uuid())
+  prizeId       String    @unique
+  prize         Prize     @relation(fields: [prizeId], references: [id], onDelete: Cascade)
+  giftName      String
+  totalStock    Int       @default(0)
+  reservedStock Int       @default(0)
+  redeemedStock Int       @default(0)
+  monthlyLimit  Int       @default(50)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Spin {
+  id                          String      @id @default(uuid())
+  customerId                  String
+  customer                    Customer    @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  campaignId                  String
+  campaign                    Campaign    @relation(fields: [campaignId], references: [id], onDelete: Restrict)
+  periodKey                   String      // "YYYY-MM" in Asia/Kolkata
+  prizeId                     String
+  prize                       Prize       @relation(fields: [prizeId], references: [id], onDelete: Restrict)
+  prizeConfigurationVersionId String?
+  status                      String      @default("COMPLETED")
+  idempotencyKey              String?
+  clientIp                    String?
+  createdAt                   DateTime    @default(now())
+  completedAt                 DateTime    @default(now())
+  reward                      Reward?
+
+  // Strict non-negotiable requirement: ONE spin per verified mobile customer per calendar month
+  @@unique([customerId, periodKey], name: "customer_period_unique")
+  @@index([periodKey])
+  @@index([customerId])
+}
+
+// BINGOOO Coins: Immutable Loyalty Account & Ledger
+model LoyaltyAccount {
+  id               String               @id @default(uuid())
+  customerId       String               @unique
+  customer         Customer             @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  status           String               @default("ACTIVE") // ACTIVE, FROZEN, CLOSED
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  ledgerEntries    LoyaltyLedgerEntry[]
+}
+
+model LoyaltyLedgerEntry {
+  id                String         @id @default(uuid())
+  loyaltyAccountId  String
+  loyaltyAccount    LoyaltyAccount @relation(fields: [loyaltyAccountId], references: [id], onDelete: Cascade)
+  customerId        String
+  amount            Int            // Signed integer (+50, -200)
+  type              String         // EARN, REDEEM, BONUS, EXPIRE, REVERSAL
+  sourceType        String         // PURCHASE, REFERRAL, STORE_VISIT, BIRTHDAY, WELCOME, REDEMPTION
+  sourceId          String?        // ID of purchase, referral, checkin, etc.
+  idempotencyKey    String?        @unique
+  occurredAt        DateTime       @default(now())
+  effectiveAt       DateTime       @default(now())
+  expiresAt         DateTime?
+  reversalOfEntryId String?
+  metadata          String?        // JSON string
+
+  @@index([customerId])
+  @@index([sourceType, sourceId])
+}
+
+model LoyaltyRedemption {
+  id             String    @id @default(uuid())
+  customerId     String
+  customer       Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  coinsSpent     Int
+  rewardId       String?   @unique
+  reward         Reward?   @relation(fields: [rewardId], references: [id])
+  status         String    @default("COMPLETED") // COMPLETED, CANCELLED
+  idempotencyKey String    @unique
+  createdAt      DateTime  @default(now())
+  completedAt    DateTime  @default(now())
+}
+
+// Module 3: Refer & Earn
+model ReferralCode {
+  id         String     @id @default(uuid())
+  customerId String     @unique
+  customer   Customer   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  code       String     @unique // e.g. BGO8K42
+  active     Boolean    @default(true)
+  createdAt  DateTime   @default(now())
+  referrals  Referral[]
+}
+
+model Referral {
+  id                  String        @id @default(uuid())
+  referrerCustomerId  String
+  referrer            Customer      @relation("ReferrerRelation", fields: [referrerCustomerId], references: [id], onDelete: Cascade)
+  referredCustomerId  String        @unique
+  referred            Customer      @relation("ReferredRelation", fields: [referredCustomerId], references: [id], onDelete: Cascade)
+  referralCodeId      String
+  referralCode        ReferralCode  @relation(fields: [referralCodeId], references: [id], onDelete: Restrict)
+  status              String        @default("PENDING") // PENDING, VERIFIED, QUALIFIED, REWARDED, REJECTED, REVERSED
+  firstPurchaseId     String?       @unique
+  firstPurchase       Purchase?     @relation(fields: [firstPurchaseId], references: [id])
+  qualifiedAt         DateTime?
+  rewardedAt          DateTime?
+  rejectionReason     String?
+  createdAt           DateTime      @default(now())
+
+  @@index([referrerCustomerId])
+}
+
+// Module 4: Stores & QR Code Store Check-ins
+model Store {
+  id            String         @id @default(uuid())
+  name          String
+  storeCode     String         @unique // e.g. SRIKAKULAM_01
+  address       String
+  city          String         @default("Srikakulam")
+  active        Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  checkIns      StoreCheckIn[]
+  qrChallenges  QrChallenge[]
+  purchases     Purchase[]
+}
+
+model QrChallenge {
+  id               String         @id @default(uuid())
+  storeId          String
+  store            Store          @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  nonceHash        String         @unique
+  expiresAt        DateTime
+  issuedAt         DateTime       @default(now())
+  status           String         @default("ACTIVE") // ACTIVE, CONSUMED, EXPIRED
+  createdByAdminId String?
+  createdByAdmin   AdminUser?     @relation(fields: [createdByAdminId], references: [id])
+  checkIns         StoreCheckIn[]
+}
+
+model StoreCheckIn {
+  id                 String       @id @default(uuid())
+  storeId            String
+  store              Store        @relation(fields: [storeId], references: [id], onDelete: Restrict)
+  customerId         String
+  customer           Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  checkInPeriodKey   String       // "YYYY-MM-DD" in Asia/Kolkata
+  qrChallengeId      String?
+  qrChallenge        QrChallenge? @relation(fields: [qrChallengeId], references: [id])
+  verifiedByAdminId  String?
+  verifiedByAdmin    AdminUser?   @relation(fields: [verifiedByAdminId], references: [id])
+  status             String       @default("PENDING") // PENDING, VERIFIED, REJECTED
+  coinsAwarded       Int          @default(0)
+  createdAt          DateTime     @default(now())
+  verifiedAt         DateTime?
+
+  // Only one verified store visit bonus per customer per calendar day
+  @@unique([customerId, storeId, checkInPeriodKey], name: "customer_store_day_unique")
+  @@index([customerId])
+}
+
+// Offline Purchases for Coins & Referral Qualification
+model Purchase {
+  id                 String       @id @default(uuid())
+  customerId         String
+  customer           Customer     @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  storeId            String
+  store              Store        @relation(fields: [storeId], references: [id], onDelete: Restrict)
+  externalReceiptId  String       // Receipt/Invoice number from cashier
+  grossAmountPaise   Int          // Amount in integer paise (₹1250 = 125000)
+  discountAmountPaise Int         @default(0)
+  eligibleAmountPaise Int          // Net amount earning points
+  refundedAmountPaise Int         @default(0)
+  coinsEarned        Int          @default(0)
+  status             String       @default("COMPLETED") // COMPLETED, PARTIALLY_REFUNDED, REFUNDED, CANCELLED
+  purchasedAt        DateTime     @default(now())
+  verifiedByAdminId  String?
+  verifiedByAdmin    AdminUser?   @relation(fields: [verifiedByAdminId], references: [id])
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  referral           Referral?
+  rewardRedemptions  Redemption[]
+
+  @@unique([storeId, externalReceiptId], name: "store_receipt_unique")
+  @@index([customerId])
+}
+
+// Module 5: Birthday Rewards
+model BirthdayRewardClaim {
+  id         String    @id @default(uuid())
+  customerId String
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  rewardYear Int       // e.g. 2026
+  rewardId   String?   @unique
+  reward     Reward?   @relation(fields: [rewardId], references: [id])
+  status     String    @default("CLAIMED") // CLAIMED, REDEEMED, EXPIRED
+  issuedAt   DateTime  @default(now())
+
+  // Annual uniqueness: exactly one birthday reward per customer per calendar year
+  @@unique([customerId, rewardYear], name: "customer_birthday_year_unique")
+  @@index([customerId])
+}
+
+// Unified Reward Wallet (Discounts, Gifts, Coins Vouchers, Birthday Offers)
+model Reward {
+  id                    String               @id @default(uuid())
+  code                  String               @unique // e.g. BGO-XXXX-XXXX
+  customerId            String
+  customer              Customer             @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  spinId                String?              @unique
+  spin                  Spin?                @relation(fields: [spinId], references: [id], onDelete: Cascade)
+  prizeId               String?
+  prize                 Prize?               @relation(fields: [prizeId], references: [id], onDelete: Restrict)
+  campaignId            String?
+  campaign              Campaign?            @relation(fields: [campaignId], references: [id], onDelete: Restrict)
+  sourceType            String               @default("SPIN") // SPIN, COINS_REDEMPTION, BIRTHDAY, REFERRAL_WELCOME
+  sourceId              String?
+  type                  String               // DISCOUNT_20, DISCOUNT_10, DISCOUNT_5, FREE_GIFT, COINS_VOUCHER
+  status                String               @default("ISSUED") // ISSUED, REDEEMED, EXPIRED, CANCELLED
+  discountPct           Int?
+  discountValuePaise    Int?                 // Fixed amount discount in paise
+  isGift                Boolean              @default(false)
+  issuedAt              DateTime             @default(now())
+  expiresAt             DateTime
+  revokedAt             DateTime?
+  revokeReason          String?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  redemption            Redemption?
+  loyaltyRedemption     LoyaltyRedemption?
+  birthdayClaim         BirthdayRewardClaim?
+
+  @@index([customerId])
+  @@index([code])
+  @@index([status])
+}
+
+model Redemption {
+  id            String    @id @default(uuid())
+  rewardId      String    @unique
+  reward        Reward    @relation(fields: [rewardId], references: [id], onDelete: Restrict)
+  staffId       String
+  staff         AdminUser @relation(fields: [staffId], references: [id], onDelete: Restrict)
+  purchaseId    String?
+  purchase      Purchase? @relation(fields: [purchaseId], references: [id])
+  redeemedAt    DateTime  @default(now())
+  storeLocation String    @default("Srikakulam Store")
+  notes         String?
+}
+
+// Cross-Program Fraud Flags
+model FraudFlag {
+  id                String     @id @default(uuid())
+  customerId        String
+  category          String     // SELF_REFERRAL, VELOCITY_CHECKIN, REPEATED_BIRTHDAY_CHANGE, CONCURRENT_SPIN
+  severity          String     @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  relatedEntityType String?
+  relatedEntityId   String?
+  status            String     @default("PENDING") // PENDING, REVIEWED, DISMISSED, ACTIONED
+  createdAt         DateTime   @default(now())
+  reviewedByAdminId String?
+  reviewedAt        DateTime?
+
+  @@index([customerId])
+  @@index([status])
+}
+
+model AuditLog {
+  id         String     @id @default(uuid())
+  actorType  String     @default("ADMIN") // ADMIN, CUSTOMER, SYSTEM
+  adminId    String?
+  admin      AdminUser? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  action     String     // e.g. "PRIZE_UPDATE", "PURCHASE_VERIFY", "BIRTHDAY_CLAIM", "COINS_REDEEM"
+  entityType String
+  entityId   String?
+  details    String?    // JSON string
+  ipAddress  String?
+  createdAt  DateTime   @default(now())
+
+  @@index([action, createdAt])
+}
+
+model RewardRule {
+  id               String     @id @default(uuid())
+  programType      String     // SPIN, LOYALTY_COINS, REFERRALS, STORE_QR, BIRTHDAYS
+  version          Int        @default(1)
+  configuration    String     // JSON configuration of rules
+  effectiveFrom    DateTime   @default(now())
+  effectiveUntil   DateTime?
+  active           Boolean    @default(true)
+  updatedByAdminId String?
+  updatedByAdmin   AdminUser? @relation(fields: [updatedByAdminId], references: [id])
+  updatedAt        DateTime   @updatedAt
+
+  @@unique([programType, version])
+}
+
+model AppSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  type      String   @default("string")
+  updatedAt DateTime @updatedAt
+}

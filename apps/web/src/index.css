@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #0F0F0F;
+    color: #FFFFFF;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: -0.03em;
+  }
+}
+
+/* Bauhaus Geometric Accent Utilities */
+.bauhaus-grid-bg {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+.bauhaus-card {
+  border: 2px solid #282828;
+  background: #151515;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bauhaus-card:hover {
+  border-color: #FFFFFF;
+  transform: translate(-3px, -3px);
+  box-shadow: 6px 6px 0px 0px #C91F32;
+}
+
+.bauhaus-card-yellow:hover {
+  border-color: #FFFFFF;
+  transform: translate(-3px, -3px);
+  box-shadow: 6px 6px 0px 0px #F5B700;
+}
+
+.bauhaus-card-blue:hover {
+  border-color: #FFFFFF;
+  transform: translate(-3px, -3px);
+  box-shadow: 6px 6px 0px 0px #16428C;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0F0F0F;
+}
+::-webkit-scrollbar-thumb {
+  background: #333333;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C91F32;
+}

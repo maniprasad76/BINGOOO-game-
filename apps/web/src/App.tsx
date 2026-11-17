@@ -16,6 +16,7 @@ import { RewardDetailPage } from './pages/RewardDetailPage';
 import { HowItWorksPage } from './pages/HowItWorksPage';
 import { ContactPage } from './pages/ContactPage';
 import { TermsPage, PrivacyPage } from './pages/LegalPages';
+import { SupabaseTodosPage } from './pages/SupabaseTodosPage';
 import { AdminLoginPage } from './admin/AdminLoginPage';
 import { AdminDashboard } from './admin/AdminDashboard';
 import { ThemeProvider } from './context/ThemeContext';
@@ -72,6 +73,7 @@ export const App: React.FC = () => {
                     <Route path="/contact" element={<ContactPage />} />
                     <Route path="/terms" element={<TermsPage />} />
                     <Route path="/privacy" element={<PrivacyPage />} />
+                    <Route path="/todos" element={<SupabaseTodosPage />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </main>

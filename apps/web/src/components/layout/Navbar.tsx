@@ -96,17 +96,10 @@ export const Navbar: React.FC = () => {
           </Link>
         </nav>
 
-        {/* Customer State, Celestial Emblem & Action Button */}
+        {/* Customer State, Celestial Icon & Action Button */}
         <div className="flex items-center space-x-2 sm:space-x-3">
-          {/* Celestial Sun & Moon Astrolabe Emblem (Not a toggle button) */}
-          <div className="hidden sm:inline-block">
-            <CelestialEmblem />
-          </div>
-
-          {/* Compact Celestial on Mobile */}
-          <div className="sm:hidden inline-block">
-            <CelestialEmblem compact />
-          </div>
+          {/* Sun & Moon Celestial Icon */}
+          <CelestialEmblem />
 
           {userEmail ? (
             <div className="flex items-center space-x-2">

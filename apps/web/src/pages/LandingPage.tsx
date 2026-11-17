@@ -197,26 +197,39 @@ export const LandingPage: React.FC = () => {
 
       {/* Store Location & Hours */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="p-8 rounded-3xl bg-gradient-to-r from-[#181818] via-[#1F1F1F] to-[#181818] border border-[#2A2A2A] flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="p-8 bg-[#141414] border-3 border-white shadow-[6px_6px_0px_0px_#C91F32] flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center md:text-left">
-            <h3 className="text-xl sm:text-2xl font-bold font-display uppercase tracking-wide text-white">
-              Visit BINGOOO In Srikakulam
+            <div className="inline-flex items-center space-x-2 px-2.5 py-0.5 bg-[#F5B700] text-black font-mono font-bold text-[10px] uppercase tracking-wider border border-black">
+              <span>EXACT STORE LOCATION</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black font-display uppercase tracking-wide text-white">
+              Visit BINGO<span className="text-[#C91F32]">OO</span> In Srikakulam
             </h3>
             <p className="text-sm text-gray-300 flex items-center justify-center md:justify-start space-x-2">
               <MapPin className="w-4 h-4 text-[#C91F32]" />
-              <span>Main Road, Srikakulam, Andhra Pradesh, India</span>
+              <span className="font-sans">NH16, Kushalpuram, Srikakulam District, Andhra Pradesh — 532001</span>
             </p>
-            <p className="text-xs text-gray-400">
-              Open 7 days a week: 10:00 AM to 9:30 PM IST
+            <p className="text-xs text-gray-400 font-mono">
+              Open 7 days a week: 10:00 AM to 9:30 PM IST // GPS: 18.296273, 83.869070
             </p>
           </div>
 
-          <Link
-            to="/contact"
-            className="px-6 py-3 rounded-xl bg-white text-black font-bold text-sm tracking-wide hover:bg-gray-200 transition shrink-0"
-          >
-            Get Store Directions
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+            <a
+              href="https://maps.app.goo.gl/hV1XT66gjiD9zG4dA"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 py-3 bg-[#C91F32] hover:bg-[#B01828] text-white font-mono font-black text-xs uppercase tracking-widest transition-all border-2 border-white shadow-[3px_3px_0px_0px_#F5B700] hover:translate-x-0.5 hover:translate-y-0.5 flex items-center space-x-2"
+            >
+              <span>OPEN GOOGLE MAPS ↗</span>
+            </a>
+            <Link
+              to="/contact"
+              className="px-5 py-3 bg-[#222222] hover:bg-white hover:text-black text-white font-mono font-bold text-xs uppercase tracking-wider transition border border-white"
+            >
+              Store Info & Live Map
+            </Link>
+          </div>
         </div>
       </section>
     </div>

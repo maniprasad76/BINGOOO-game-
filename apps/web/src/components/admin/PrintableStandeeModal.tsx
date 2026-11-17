@@ -14,7 +14,7 @@ export const PrintableStandeeModal: React.FC<PrintableStandeeModalProps> = ({
   isOpen,
   onClose,
   storeName = "BINGOOO MEN'S WEAR",
-  storeAddress = "Main Road, Srikakulam, Andhra Pradesh — 532001",
+  storeAddress = "NH16, Kushalpuram, Srikakulam District, Andhra Pradesh — 532001",
   checkInUrl = "https://bingooo.co.in/club/check-in"
 }) => {
   const [qrDataUrl, setQrDataUrl] = useState<string>('');

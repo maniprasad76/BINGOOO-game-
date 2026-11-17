@@ -99,6 +99,14 @@ export const StoreCheckInPage: React.FC = () => {
                   <MapPin className="w-4 h-4 text-[#C91F32] shrink-0 mt-0.5" />
                   <span>{s.address}, {s.city}</span>
                 </p>
+                <a
+                  href="https://maps.app.goo.gl/hV1XT66gjiD9zG4dA"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block text-[10px] font-mono font-bold text-[#F5B700] hover:underline"
+                >
+                  📍 Open in Google Maps ↗
+                </a>
                 <span className="text-xs text-[#F5B700] font-mono font-bold block pt-1">
                   DAILY REWARD: +5 BINGOOO COINS
                 </span>

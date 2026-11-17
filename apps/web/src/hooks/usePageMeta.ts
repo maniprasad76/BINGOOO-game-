@@ -48,7 +48,7 @@ const routeMetaMap: Record<string, { title: string; desc: string }> = {
   },
   '/contact': {
     title: 'Store Location & Hours | BINGOOO Srikakulam',
-    desc: 'Visit BINGOOO Men’s Wear on Main Road, Srikakulam, Andhra Pradesh. Open 10 AM to 9:30 PM daily.'
+    desc: 'Visit BINGOOO Men’s Wear on NH16, Kushalpuram, Srikakulam, Andhra Pradesh. Open 10 AM to 9:30 PM daily.'
   },
   '/terms': {
     title: 'Promotion Terms & Conditions | BINGOOO Srikakulam',

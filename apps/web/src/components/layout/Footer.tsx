@@ -48,10 +48,20 @@ export const Footer: React.FC = () => {
               <span>SRIKAKULAM STORE</span>
             </h4>
             <div className="space-y-2 text-xs">
-              <p className="flex items-start space-x-2">
-                <MapPin className="w-4 h-4 text-[#C91F32] shrink-0 mt-0.5" />
-                <span className="font-sans text-gray-300">Main Road, Srikakulam, Andhra Pradesh, India — 532001</span>
-              </p>
+              <a
+                href="https://maps.app.goo.gl/hV1XT66gjiD9zG4dA"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start space-x-2 text-gray-300 hover:text-[#F5B700] transition group"
+              >
+                <MapPin className="w-4 h-4 text-[#C91F32] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
+                <span className="font-sans leading-relaxed">
+                  NH16, Kushalpuram, Srikakulam District, Andhra Pradesh — 532001
+                  <span className="block text-[10px] text-[#F5B700] font-mono mt-0.5 font-bold">
+                    📍 Open Google Maps Directions ↗
+                  </span>
+                </span>
+              </a>
               <p className="flex items-center space-x-2">
                 <Clock className="w-4 h-4 text-[#F5B700] shrink-0" />
                 <span className="font-mono text-gray-300">10:00 AM – 9:30 PM (DAILY)</span>

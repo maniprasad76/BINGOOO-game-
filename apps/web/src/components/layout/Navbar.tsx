@@ -25,14 +25,12 @@ export const Navbar: React.FC = () => {
   return (
     <header className="sticky top-0 z-50 bg-[#0F0F0F] border-b-2 border-[#282828] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Bauhaus Geometric Brand Logo - Directly opens official bingooo.co.in website */}
-        <a
-          href="https://www.bingooo.co.in"
-          target="_blank"
-          rel="noopener noreferrer"
+        {/* Bauhaus Geometric Brand Logo - Returns to homepage on click */}
+        <Link
+          to="/"
           onClick={closeMenu}
           className="flex items-center space-x-2.5 group cursor-pointer"
-          title="Visit official store: https://www.bingooo.co.in"
+          title="BINGOOO Homepage"
         >
           <div className="w-8 h-8 bg-[#C91F32] border-2 border-white flex items-center justify-center font-black text-sm tracking-tighter text-white shadow-[2px_2px_0px_0px_#F5B700] group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-transform shrink-0">
             B
@@ -47,7 +45,7 @@ export const Navbar: React.FC = () => {
               SRIKAKULAM // MEN'S WEAR
             </span>
           </div>
-        </a>
+        </Link>
 
         {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center space-x-5 text-xs font-bold uppercase tracking-wider">

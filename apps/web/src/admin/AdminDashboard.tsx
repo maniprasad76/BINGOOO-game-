@@ -12,9 +12,13 @@ import {
   Search,
   Check,
   AlertTriangle,
-  FileText
+  FileText,
+  Printer,
+  QrCode,
+  Camera
 } from 'lucide-react';
 import { ApiClient } from '../services/api.service';
+import { PrintableStandeeModal } from '../components/admin/PrintableStandeeModal';
 
 export const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -25,9 +29,13 @@ export const AdminDashboard: React.FC = () => {
 
   // Redemption state
   const [redeemCode, setRedeemCode] = useState('');
+  const [billNumber, setBillNumber] = useState('');
   const [redeemNotes, setRedeemNotes] = useState('');
   const [redeemStatus, setRedeemStatus] = useState<any>(null);
   const [redeemError, setRedeemError] = useState<string | null>(null);
+
+  // Standee Modal
+  const [standeeModalOpen, setStandeeModalOpen] = useState(false);
 
   // Prizes state
   const [prizes, setPrizes] = useState<any[]>([]);
@@ -77,10 +85,13 @@ export const AdminDashboard: React.FC = () => {
     setRedeemError(null);
     setRedeemStatus(null);
 
+    const fullNotes = billNumber ? `Invoice #${billNumber}. ${redeemNotes}` : redeemNotes;
+
     try {
-      const res = await ApiClient.redeemVoucher(redeemCode, redeemNotes);
+      const res = await ApiClient.redeemVoucher(redeemCode, fullNotes);
       setRedeemStatus(res);
       setRedeemCode('');
+      setBillNumber('');
       setRedeemNotes('');
       loadDashboard();
     } catch (err: any) {
@@ -123,8 +134,15 @@ export const AdminDashboard: React.FC = () => {
           </span>
         </div>
 
-        <div className="flex items-center space-x-4">
-          <span className="text-xs text-gray-400">
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={() => setStandeeModalOpen(true)}
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-[#F5B700] hover:bg-[#DBA300] text-black font-mono font-bold text-xs uppercase tracking-wider transition-all border border-black shadow-[2px_2px_0px_0px_#FFFFFF]"
+          >
+            <Printer className="w-3.5 h-3.5" />
+            <span>PRINT COUNTER STANDEE</span>
+          </button>
+          <span className="text-xs text-gray-400 hidden sm:inline">
             Signed in as: <strong className="text-white">{adminUser.name || 'Admin'}</strong>
           </span>
           <button
@@ -279,37 +297,74 @@ export const AdminDashboard: React.FC = () => {
 
               <form onSubmit={handleRedeem} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
-                    Coupon Code (Format: BGO-XXXX-XXXX)
-                  </label>
-                  <input
-                    type="text"
-                    value={redeemCode}
-                    onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
-                    placeholder="BGO-A8F2-9X7K"
-                    required
-                    className="w-full px-4 py-3 bg-[#0E0E0E] border border-[#2A2A2A] rounded-xl text-white font-mono text-lg font-bold tracking-wider focus:outline-none focus:border-emerald-500 transition"
-                  />
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400">
+                      Coupon Code (Format: BGO-XXXX-XXXX)
+                    </label>
+                    <label className="text-[11px] text-[#F5B700] hover:underline cursor-pointer flex items-center space-x-1 font-mono">
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>Scan / Upload QR</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            // If a cashier takes a photo of customer's screen
+                            alert(`Voucher image (${file.name}) selected. If manual verification needed, copy the code visible on screen.`);
+                          }
+                        }}
+                      />
+                    </label>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={redeemCode}
+                      onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
+                      placeholder="BGO-A8F2-9X7K"
+                      required
+                      className="w-full px-4 py-3 bg-[#0E0E0E] border-2 border-[#2A2A2A] rounded-xl text-white font-mono text-lg font-bold tracking-wider focus:outline-none focus:border-white transition"
+                    />
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
-                    Staff Notes / Invoice Number (Optional)
+                    Store Invoice / Bill Receipt # (Mandatory for ₹3000+ T-Shirt)
+                  </label>
+                  <input
+                    type="text"
+                    value={billNumber}
+                    onChange={(e) => setBillNumber(e.target.value)}
+                    placeholder="e.g. INV-2026-8941"
+                    className="w-full px-4 py-2.5 bg-[#0E0E0E] border border-[#2A2A2A] rounded-xl text-white font-mono text-xs focus:outline-none focus:border-gray-500 transition"
+                  />
+                  <p className="text-[10px] text-amber-400/90 mt-1 font-mono">
+                    * If redeeming FREE Customised T-Shirt, verify billing amount is above ₹3,000.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
+                    Staff Notes / Garment Details (Optional)
                   </label>
                   <input
                     type="text"
                     value={redeemNotes}
                     onChange={(e) => setRedeemNotes(e.target.value)}
-                    placeholder="Bill #10423 — 2 shirts, 1 trouser"
+                    placeholder="Size L - Black Graphic T-Shirt handed over"
                     className="w-full px-4 py-2.5 bg-[#0E0E0E] border border-[#2A2A2A] rounded-xl text-white text-xs focus:outline-none focus:border-gray-500 transition"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-emerald-900/30"
+                  className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-mono font-black text-xs uppercase tracking-widest transition-all border-2 border-white shadow-[3px_3px_0px_0px_#FFFFFF] hover:translate-x-0.5 hover:translate-y-0.5"
                 >
-                  VALIDATE & REDEEM VOUCHER
+                  VALIDATE & REDEEM VOUCHER →
                 </button>
               </form>
             </div>
@@ -483,6 +538,12 @@ export const AdminDashboard: React.FC = () => {
           </div>
         )}
       </main>
+
+      {/* Printable In-Store Standee Modal */}
+      <PrintableStandeeModal
+        isOpen={standeeModalOpen}
+        onClose={() => setStandeeModalOpen(false)}
+      />
     </div>
   );
 };

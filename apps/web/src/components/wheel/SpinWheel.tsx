@@ -1,6 +1,65 @@
 import React, { useRef, useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { Sparkles, AlertCircle } from 'lucide-react';
+import { Sparkles, AlertCircle, Volume2, VolumeX } from 'lucide-react';
+
+// Web Audio API Sound Synthesizer (0 external dependencies, works offline)
+class WheelSoundFX {
+  private static ctx: AudioContext | null = null;
+  public static isMuted = false;
+
+  private static getContext() {
+    if (!this.ctx && typeof window !== 'undefined') {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioCtx) this.ctx = new AudioCtx();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+    return this.ctx;
+  }
+
+  public static playTick() {
+    if (this.isMuted) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(650, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.03);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.03);
+    } catch {}
+  }
+
+  public static playWinFanfare() {
+    if (this.isMuted) return;
+    try {
+      const ctx = this.getContext();
+      if (!ctx) return;
+      const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6 chord
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        const startTime = ctx.currentTime + idx * 0.12;
+        gain.gain.setValueAtTime(0, startTime);
+        gain.gain.linearRampToValueAtTime(0.2, startTime + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.55);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(startTime);
+        osc.stop(startTime + 0.55);
+      });
+    } catch {}
+  }
+}
 
 interface Segment {
   id: string;
@@ -24,9 +83,15 @@ export const SpinWheel: React.FC<SpinWheelProps> = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentRotation, setCurrentRotation] = useState(0);
+  const [soundEnabled, setSoundEnabled] = useState(true);
 
   const numSegments = segments.length || 8;
   const segmentAngle = 360 / numSegments;
+
+  const toggleSound = () => {
+    WheelSoundFX.isMuted = soundEnabled;
+    setSoundEnabled(!soundEnabled);
+  };
 
   // Draw wheel on canvas
   const drawWheel = (rotationDeg: number) => {
@@ -158,6 +223,7 @@ export const SpinWheel: React.FC<SpinWheelProps> = ({
       const duration = 6000; // 6 seconds
       const startTime = performance.now();
       const startAngle = currentRotation % 360;
+      let lastTickIndex = -1;
 
       const animate = (currentTime: number) => {
         const elapsed = currentTime - startTime;
@@ -167,6 +233,13 @@ export const SpinWheel: React.FC<SpinWheelProps> = ({
         const easeOut = 1 - Math.pow(1 - progress, 4);
         const currentAngle = startAngle + (finalAngle - startAngle) * easeOut;
 
+        // Mechanical sound tick at each segment boundary
+        const currentTick = Math.floor(currentAngle / (360 / numSegments));
+        if (currentTick !== lastTickIndex) {
+          lastTickIndex = currentTick;
+          WheelSoundFX.playTick();
+        }
+
         setCurrentRotation(currentAngle);
         drawWheel(currentAngle);
 
@@ -174,10 +247,11 @@ export const SpinWheel: React.FC<SpinWheelProps> = ({
           requestAnimationFrame(animate);
         } else {
           setIsSpinning(false);
+          WheelSoundFX.playWinFanfare();
           if (backendResult.isWin) {
             confetti({
-              particleCount: 100,
-              spread: 70,
+              particleCount: 120,
+              spread: 75,
               origin: { y: 0.6 }
             });
           }
@@ -233,8 +307,27 @@ export const SpinWheel: React.FC<SpinWheelProps> = ({
         </button>
       </div>
 
+      {/* Sound FX Toggle */}
+      <button
+        onClick={toggleSound}
+        className="mt-4 px-3 py-1.5 bg-[#141414] hover:bg-[#222222] border-2 border-[#333333] hover:border-white text-xs font-mono text-gray-300 flex items-center space-x-1.5 transition-all shadow-[2px_2px_0px_0px_#F5B700]"
+        title={soundEnabled ? 'Mute Sound Effects' : 'Enable Sound Effects'}
+      >
+        {soundEnabled ? (
+          <>
+            <Volume2 className="w-3.5 h-3.5 text-[#F5B700]" />
+            <span>SOUND ON</span>
+          </>
+        ) : (
+          <>
+            <VolumeX className="w-3.5 h-3.5 text-gray-500" />
+            <span>MUTED</span>
+          </>
+        )}
+      </button>
+
       {disabled && (
-        <div className="mt-5 text-xs text-gray-300 flex items-center space-x-2 bg-[#161616] px-4 py-2 border-2 border-[#333333] shadow-[3px_3px_0px_0px_#C91F32]">
+        <div className="mt-4 text-xs text-gray-300 flex items-center space-x-2 bg-[#161616] px-4 py-2 border-2 border-[#333333] shadow-[3px_3px_0px_0px_#C91F32]">
           <AlertCircle className="w-4 h-4 text-[#F5B700] shrink-0" />
           <span className="font-mono uppercase tracking-wider">MONTHLY LIMIT REACHED // ONE SPIN PER CALENDAR MONTH</span>
         </div>

@@ -1,0 +1,18 @@
+{
+  "name": "BINGOOO Rewards Club",
+  "short_name": "BINGOOO",
+  "description": "BINGOOO Men's Wear Spin & Win and Rewards Club — Srikakulam",
+  "start_url": "/club",
+  "display": "standalone",
+  "background_color": "#0F0F0F",
+  "theme_color": "#C91F32",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

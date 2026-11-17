@@ -67,7 +67,8 @@ export const ScratchCardPage: React.FC = () => {
     loadSpinDetails();
   }, [token]);
 
-  // Canvas Scratch Card Painting
+  const lastPointRef = useRef<{ x: number; y: number } | null>(null);
+
   const initCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -117,10 +118,10 @@ export const ScratchCardPage: React.FC = () => {
 
     // Center Badge
     ctx.fillStyle = '#0A0A0A';
-    ctx.fillRect(w / 2 - 110, h / 2 - 45, 220, 90);
+    ctx.fillRect(w / 2 - 120, h / 2 - 45, 240, 90);
     ctx.strokeStyle = '#F5B700';
     ctx.lineWidth = 2;
-    ctx.strokeRect(w / 2 - 110, h / 2 - 45, 220, 90);
+    ctx.strokeRect(w / 2 - 120, h / 2 - 45, 240, 90);
 
     // Text on Foil
     ctx.fillStyle = '#FFFFFF';
@@ -130,34 +131,33 @@ export const ScratchCardPage: React.FC = () => {
 
     ctx.fillStyle = '#F5B700';
     ctx.font = '700 12px "Space Mono", monospace';
-    ctx.fillText('★ SCRATCH & REVEAL ★', w / 2, h / 2 + 2);
+    ctx.fillText('★ SCRATCH WITH YOUR HAND ★', w / 2, h / 2 + 2);
 
     ctx.fillStyle = '#AAAAAA';
     ctx.font = '600 10px "Space Mono", monospace';
-    ctx.fillText('DRAG FINGER OR MOUSE HERE', w / 2, h / 2 + 24);
+    ctx.fillText('RUB WITH FINGER OR MOUSE TO REVEAL', w / 2, h / 2 + 24);
 
     setIsScratched(false);
     setScratchPercent(0);
-    setHasInteracted(false);
+    lastPointRef.current = null;
     setSparkles([]);
   }, []);
 
   const addSparkles = (x: number, y: number) => {
     const colors = ['#F5B700', '#FFE066', '#FFFFFF', '#C91F32'];
-    const newSparkles = Array.from({ length: 3 }).map(() => ({
+    const newSparkles = Array.from({ length: 2 }).map(() => ({
       id: Math.random(),
-      x: x + (Math.random() - 0.5) * 30,
-      y: y + (Math.random() - 0.5) * 30,
-      size: Math.random() * 6 + 3,
+      x: x + (Math.random() - 0.5) * 20,
+      y: y + (Math.random() - 0.5) * 20,
+      size: Math.random() * 5 + 2,
       color: colors[Math.floor(Math.random() * colors.length)]
     }));
 
-    setSparkles((prev) => [...prev.slice(-15), ...newSparkles]);
+    setSparkles((prev) => [...prev.slice(-12), ...newSparkles]);
   };
 
   useEffect(() => {
     if (!loading) {
-      // Small timeout to ensure DOM rect is calculated
       const timer = setTimeout(() => {
         initCanvas();
       }, 50);
@@ -165,14 +165,10 @@ export const ScratchCardPage: React.FC = () => {
     }
   }, [loading, initCanvas]);
 
-  // Scratch Drawing
-  const scratchAt = (clientX: number, clientY: number) => {
+  // Scratch Drawing - Smooth Connected Stroke
+  const scratchAtPosition = (clientX: number, clientY: number) => {
     const canvas = canvasRef.current;
     if (!canvas || isScratched) return;
-
-    if (!hasInteracted) {
-      setHasInteracted(true);
-    }
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -182,15 +178,64 @@ export const ScratchCardPage: React.FC = () => {
     const y = clientY - rect.top;
 
     ctx.globalCompositeOperation = 'destination-out';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 56; // Generous natural human finger scratch diameter
+
     ctx.beginPath();
-    ctx.arc(x, y, 28, 0, Math.PI * 2);
-    ctx.fill();
+    if (lastPointRef.current) {
+      ctx.moveTo(lastPointRef.current.x, lastPointRef.current.y);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    } else {
+      ctx.arc(x, y, 28, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
+    lastPointRef.current = { x, y };
     addSparkles(x, y);
-
-    // Check transparency every few scratches
     checkScratchCompletion();
   };
+
+  // Native Non-Passive Touch Listeners to prevent page scrolling on mobile
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      e.preventDefault();
+      if (e.touches.length > 0) {
+        setIsDrawing(true);
+        lastPointRef.current = null;
+        scratchAtPosition(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      if (e.touches.length > 0) {
+        scratchAtPosition(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      e.preventDefault();
+      setIsDrawing(false);
+      lastPointRef.current = null;
+    };
+
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd, { passive: false });
+    canvas.addEventListener('touchcancel', onTouchEnd, { passive: false });
+
+    return () => {
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
+      canvas.removeEventListener('touchcancel', onTouchEnd);
+    };
+  }, [isScratched]);
 
   const checkScratchCompletion = () => {
     const canvas = canvasRef.current;
@@ -199,16 +244,12 @@ export const ScratchCardPage: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const dpr = window.devicePixelRatio || 1;
-    const w = Math.floor(canvas.width / 4);
-    const h = Math.floor(canvas.height / 4);
-
     try {
       const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imgData.data;
       let transparentCount = 0;
       const totalPixels = data.length / 4;
-      const sampleStep = 16; // Sample every 16th pixel for speed
+      const sampleStep = 16;
 
       for (let i = 3; i < data.length; i += 4 * sampleStep) {
         if (data[i] === 0) {
@@ -219,7 +260,7 @@ export const ScratchCardPage: React.FC = () => {
       const percent = Math.min(100, Math.round((transparentCount / (totalPixels / sampleStep)) * 100));
       setScratchPercent(percent);
 
-      if (percent >= 38) {
+      if (percent >= 35) {
         revealAll();
       }
     } catch (e) {
@@ -236,38 +277,24 @@ export const ScratchCardPage: React.FC = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     setIsScratched(true);
     setScratchPercent(100);
+    lastPointRef.current = null;
   };
 
-  // Mouse Handlers
+  // Mouse Handlers for Desktop
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     setIsDrawing(true);
-    scratchAt(e.clientX, e.clientY);
+    lastPointRef.current = null;
+    scratchAtPosition(e.clientX, e.clientY);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
-    scratchAt(e.clientX, e.clientY);
+    scratchAtPosition(e.clientX, e.clientY);
   };
 
   const handleMouseUp = () => {
     setIsDrawing(false);
-  };
-
-  // Touch Handlers for Mobile
-  const handleTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    if (e.touches.length > 0) {
-      setIsDrawing(true);
-      scratchAt(e.touches[0].clientX, e.touches[0].clientY);
-    }
-  };
-
-  const handleTouchMove = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    if (!isDrawing || e.touches.length === 0) return;
-    scratchAt(e.touches[0].clientX, e.touches[0].clientY);
-  };
-
-  const handleTouchEnd = () => {
-    setIsDrawing(false);
+    lastPointRef.current = null;
   };
 
   const handleCopyCode = (code: string) => {
@@ -311,43 +338,24 @@ export const ScratchCardPage: React.FC = () => {
       </div>
 
       {/* Main Interactive Scratch Card Area */}
-      <div className="max-w-lg mx-auto space-y-4">
-        {/* CSS Keyframes for Hand Scratching Motion */}
-        <style>{`
-          @keyframes scratchHandMove {
-            0% {
-              transform: translate(-45px, -15px) rotate(-18deg);
-            }
-            25% {
-              transform: translate(45px, 15px) rotate(14deg);
-            }
-            50% {
-              transform: translate(-35px, 20px) rotate(-14deg);
-            }
-            75% {
-              transform: translate(40px, -10px) rotate(16deg);
-            }
-            100% {
-              transform: translate(-45px, -15px) rotate(-18deg);
-            }
-          }
-          .animate-scratch-hand {
-            animation: scratchHandMove 1.6s ease-in-out infinite;
-          }
-        `}</style>
-
-        {/* Attention Grabbing Hand Scratch Banner */}
-        <div className="flex justify-center">
-          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-[#C91F32] text-white border-2 border-white font-mono font-black text-xs uppercase tracking-widest shadow-[4px_4px_0px_0px_#F5B700] animate-bounce">
-            <span className="text-base animate-pulse">🖐️</span>
-            <span>RUB & SCRATCH WITH YOUR HAND TO REVEAL PRIZE!</span>
-            <span className="text-base animate-pulse">🖐️</span>
-          </div>
+      <div className="max-w-lg mx-auto space-y-3">
+        {/* Real-time Scratch Guide & Percentage */}
+        <div className="flex items-center justify-between px-2 font-mono text-xs">
+          <span className="flex items-center space-x-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#F5B700] animate-pulse" />
+            <span className="text-gray-200 uppercase font-bold">
+              {isScratched ? 'PRIZE UNLOCKED' : 'TOUCH & RUB WITH FINGER TO SCRATCH'}
+            </span>
+          </span>
+          <span className="text-[#F5B700] font-bold font-mono">
+            {isScratched ? '100% REVEALED' : scratchPercent > 0 ? `${scratchPercent}% SCRATCHED` : '0%'}
+          </span>
         </div>
 
         <div
           ref={containerRef}
-          className="relative w-full h-[360px] sm:h-[400px] bg-[#111111] border-4 border-white shadow-[10px_10px_0px_0px_#C91F32] overflow-hidden select-none cursor-grab active:cursor-grabbing"
+          className="relative w-full h-[360px] sm:h-[400px] bg-[#111111] border-4 border-white shadow-[10px_10px_0px_0px_#C91F32] overflow-hidden select-none touch-none"
+          style={{ touchAction: 'none' }}
         >
           {/* UNDERNEATH LAYER: The Revealed Spin Details */}
           <div className="absolute inset-0 p-6 flex flex-col justify-between bg-gradient-to-br from-[#181818] to-[#0A0A0A] text-white">
@@ -485,22 +493,20 @@ export const ScratchCardPage: React.FC = () => {
             </div>
           </div>
 
-          {/* TOP CANVAS FOIL LAYER (Can be scratched off) */}
+          {/* TOP CANVAS FOIL LAYER (Silky Smooth Interactive Scratch with Finger/Hand) */}
           <canvas
             ref={canvasRef}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            className={`absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing z-10 transition-opacity duration-300 ${
+            className={`absolute inset-0 w-full h-full touch-none select-none z-10 transition-opacity duration-300 cursor-crosshair ${
               isScratched ? 'pointer-events-none opacity-0' : 'opacity-100'
             }`}
+            style={{ touchAction: 'none' }}
           />
 
-          {/* Interactive Touch Sparkles */}
+          {/* Interactive Touch Sparkles when finger scratches */}
           {sparkles.map((s) => (
             <div
               key={s.id}
@@ -514,74 +520,6 @@ export const ScratchCardPage: React.FC = () => {
               className="absolute rounded-full pointer-events-none animate-ping z-20 shadow-[0_0_8px_#F5B700]"
             />
           ))}
-
-          {/* Attention-Grabbing Animated Scratch Hand & Swiping Guide */}
-          {!hasInteracted && !isScratched && (
-            <div className="absolute inset-0 z-20 pointer-events-none flex flex-col items-center justify-center p-4 transition-all duration-300">
-              {/* Animated Scratching Hand with Coin */}
-              <div className="relative animate-scratch-hand">
-                {/* Scratch Glow Behind Hand */}
-                <div className="absolute -top-3 -left-4 w-16 h-16 bg-[#F5B700]/40 rounded-full blur-md animate-pulse" />
-
-                {/* Stylized Hand Holding Gold Scratch Coin SVG */}
-                <svg
-                  className="w-20 h-20 sm:w-24 sm:h-24 drop-shadow-[0_8px_12px_rgba(0,0,0,0.7)]"
-                  viewBox="0 0 100 100"
-                  fill="none"
-                >
-                  {/* Shiny Gold Scratch Coin */}
-                  <circle cx="60" cy="36" r="16" fill="#F5B700" stroke="#FFFFFF" strokeWidth="2.5" />
-                  <circle cx="60" cy="36" r="12" fill="#D49B00" stroke="#FFE066" strokeWidth="1.5" />
-                  <text
-                    x="60"
-                    y="40"
-                    textAnchor="middle"
-                    fill="#FFFFFF"
-                    fontWeight="900"
-                    fontSize="12"
-                    fontFamily="monospace"
-                  >
-                    ★
-                  </text>
-
-                  {/* Cartoon / Bauhaus Human Hand */}
-                  <path
-                    d="M32 76 C24 64 24 50 34 40 C38 36 44 36 48 42 L56 50 C58 53 62 53 64 50 C66 47 68 43 72 46 C76 49 74 55 70 60 L62 72 C54 84 42 86 32 76 Z"
-                    fill="#FFE0B2"
-                    stroke="#111111"
-                    strokeWidth="3"
-                    strokeLinejoin="round"
-                  />
-                  {/* Thumb Holding Coin */}
-                  <path
-                    d="M48 42 C50 34 56 32 60 36 C64 40 62 46 56 50 Z"
-                    fill="#FFCC80"
-                    stroke="#111111"
-                    strokeWidth="2.5"
-                  />
-                  {/* Red Bauhaus Cuff */}
-                  <path
-                    d="M20 90 L38 78 L28 68 L10 80 Z"
-                    fill="#C91F32"
-                    stroke="#FFFFFF"
-                    strokeWidth="2.5"
-                  />
-                </svg>
-              </div>
-
-              {/* Pulsing Attention Banner Directly Under Hand */}
-              <div className="mt-4 bg-[#0A0A0A]/95 border-2 border-[#F5B700] px-4 py-2 text-center shadow-[4px_4px_0px_0px_#C91F32] backdrop-blur-sm animate-pulse max-w-xs">
-                <span className="text-xs sm:text-sm font-display font-black text-white uppercase tracking-wider flex items-center justify-center space-x-1.5">
-                  <span>👉</span>
-                  <span className="text-[#F5B700]">RUB WITH HAND HERE!</span>
-                  <span>👈</span>
-                </span>
-                <span className="text-[10px] font-mono text-gray-300 block uppercase tracking-wide mt-0.5">
-                  Swipe finger or mouse across card
-                </span>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Action Controls Below Card */}

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <!-- Bauhaus Crisp Drop Shadow -->
+    <filter id="goldShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="24" dy="24" stdDeviation="0" flood-color="#F5B700" />
+    </filter>
+  </defs>
+  
+  <!-- Outer Gold Offset Rectangle (Bauhaus Signature Shadow) -->
+  <rect x="64" y="64" width="400" height="400" rx="44" fill="#F5B700" />
+  
+  <!-- Main Crimson Red Badge with Thick White Border -->
+  <rect x="44" y="44" width="400" height="400" rx="44" fill="#C91F32" stroke="#FFFFFF" stroke-width="24" />
+  
+  <!-- Bold White 'B' Letter (Centered Bauhaus Typography) -->
+  <text 
+    x="244" 
+    y="346" 
+    font-family="'Space Grotesk', 'Outfit', 'Arial Black', sans-serif" 
+    font-weight="900" 
+    font-size="310" 
+    fill="#FFFFFF" 
+    text-anchor="middle"
+    letter-spacing="-10"
+  >B</text>
+
+  <!-- Gold Dot Accent -->
+  <circle cx="388" cy="108" r="18" fill="#F5B700" stroke="#FFFFFF" stroke-width="6" />
+</svg>

@@ -17,7 +17,7 @@ import {
 export const ContactPage: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const mapsShortUrl = "https://maps.app.goo.gl/hV1XT66gjiD9zG4dA";
-  const exactAddress = "BINGOOO Men's Wear, NH16, Kushalpuram, Srikakulam District, Andhra Pradesh — 532001, India";
+  const exactAddress = "BINGOOO Men's Wear, NH16, Kushalpuram, Srikakulam District, Andhra Pradesh — 532410, India";
   const coordinates = "18.296273, 83.869070";
 
   const handleCopyAddress = () => {
@@ -65,7 +65,7 @@ export const ContactPage: React.FC = () => {
                 <div className="space-y-1">
                   <strong className="block text-white uppercase text-xs">Physical Address</strong>
                   <p className="font-sans text-gray-300 text-xs leading-relaxed">
-                    NH16 (Main Road), Kushalpuram, Etcherla Mandal, Srikakulam District, Andhra Pradesh — 532001
+                    NH16 (Main Road), Kushalpuram, Etcherla Mandal, Srikakulam District, Andhra Pradesh — 532410
                   </p>
                   <span className="inline-block px-2 py-0.5 bg-[#1F1F1F] border border-[#333333] text-[10px] text-[#F5B700]">
                     GPS: {coordinates}

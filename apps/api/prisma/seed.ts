@@ -13,7 +13,7 @@ async function main() {
   // 1. App Settings
   const defaultSettings = [
     { key: 'STORE_NAME', value: 'BINGOOO', type: 'string' },
-    { key: 'STORE_LOCATION', value: 'NH16, Kushalpuram, Srikakulam District, Andhra Pradesh, 532001, India (GPS: 18.296273, 83.869070)', type: 'string' },
+    { key: 'STORE_LOCATION', value: 'NH16, Kushalpuram, Srikakulam District, Andhra Pradesh, 532410, India (GPS: 18.296273, 83.869070)', type: 'string' },
     { key: 'STORE_PHONE', value: '+91 8942 222333', type: 'string' },
     { key: 'STORE_EMAIL', value: 'contact@bingooo.co.in', type: 'string' },
     { key: 'STORE_HOURS', value: '10:00 AM - 9:30 PM (Mon-Sun)', type: 'string' },

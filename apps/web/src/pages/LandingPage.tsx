@@ -207,7 +207,7 @@ export const LandingPage: React.FC = () => {
             </h3>
             <p className="text-sm text-gray-300 flex items-center justify-center md:justify-start space-x-2">
               <MapPin className="w-4 h-4 text-[#C91F32]" />
-              <span className="font-sans">NH16, Kushalpuram, Srikakulam District, Andhra Pradesh — 532001</span>
+              <span className="font-sans">NH16, Kushalpuram, Srikakulam District, Andhra Pradesh — 532410</span>
             </p>
             <p className="text-xs text-gray-400 font-mono">
               Open 7 days a week: 10:00 AM to 9:30 PM IST // GPS: 18.296273, 83.869070

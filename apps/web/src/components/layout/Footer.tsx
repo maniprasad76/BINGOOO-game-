@@ -56,7 +56,7 @@ export const Footer: React.FC = () => {
               >
                 <MapPin className="w-4 h-4 text-[#C91F32] shrink-0 mt-0.5 group-hover:scale-110 transition-transform" />
                 <span className="font-sans leading-relaxed">
-                  NH16, Kushalpuram, Srikakulam District, Andhra Pradesh — 532001
+                  NH16, Kushalpuram, Srikakulam District, Andhra Pradesh — 532410
                   <span className="block text-[10px] text-[#F5B700] font-mono mt-0.5 font-bold">
                     📍 Open Google Maps Directions ↗
                   </span>

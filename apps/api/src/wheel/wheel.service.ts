@@ -24,6 +24,7 @@ export interface SpinExecutionResult {
   expiresAt?: string;
   segmentIndex: number;
   isWin: boolean;
+  isTryAgain?: boolean;
   periodKey: string;
 }
 
@@ -50,24 +51,23 @@ export class WheelService {
       orderBy: { displayOrder: 'asc' }
     });
 
-    // 8-segment balanced wheel arrangement for visual symmetry
-    // [10% OFF, BETTER LUCK, 5% OFF, BETTER LUCK, FREE GIFT, BETTER LUCK, 5% OFF, BETTER LUCK]
-    const pTshirt = prizes.find((p) => p.type === PrizeType.FREE_CUSTOM_TSHIRT);
+    // 8-segment balanced wheel arrangement: 20% OFF, BETTER LUCK, 10% OFF, TRY AGAIN, FREE GIFT, 5% OFF, BETTER LUCK, 10% OFF
     const p20 = prizes.find((p) => p.type === PrizeType.DISCOUNT_20);
     const p10 = prizes.find((p) => p.type === PrizeType.DISCOUNT_10);
     const p5 = prizes.find((p) => p.type === PrizeType.DISCOUNT_5);
     const pGift = prizes.find((p) => p.type === PrizeType.FREE_GIFT);
+    const pBetter = prizes.find((p) => p.type === PrizeType.BETTER_LUCK || p.type === PrizeType.NO_PRIZE);
+    const pAgain = prizes.find((p) => p.type === PrizeType.TRY_AGAIN);
 
-    // 8-segment wheel featuring FREE CUSTOM TSHIRT (₹3000+ Bill), 20% OFF, 10% OFF, 5% OFF, FREE GIFT
     const segments = [
-      { id: 'seg-1', prizeType: PrizeType.FREE_CUSTOM_TSHIRT, label: 'FREE T-SHIRT', color: '#C91F32', textColor: '#FFFFFF', prizeId: pTshirt?.id },
-      { id: 'seg-2', prizeType: PrizeType.DISCOUNT_20, label: '20% OFF', color: '#D4AF37', textColor: '#111111', prizeId: p20?.id },
-      { id: 'seg-3', prizeType: PrizeType.DISCOUNT_10, label: '10% OFF', color: '#1B1B1B', textColor: '#D4AF37', prizeId: p10?.id },
-      { id: 'seg-4', prizeType: PrizeType.DISCOUNT_5, label: '5% OFF', color: '#C91F32', textColor: '#FFFFFF', prizeId: p5?.id },
-      { id: 'seg-5', prizeType: PrizeType.FREE_CUSTOM_TSHIRT, label: 'FREE T-SHIRT', color: '#D4AF37', textColor: '#111111', prizeId: pTshirt?.id },
-      { id: 'seg-6', prizeType: PrizeType.DISCOUNT_20, label: '20% OFF', color: '#C91F32', textColor: '#FFFFFF', prizeId: p20?.id },
-      { id: 'seg-7', prizeType: PrizeType.DISCOUNT_10, label: '10% OFF', color: '#1B1B1B', textColor: '#D4AF37', prizeId: p10?.id },
-      { id: 'seg-8', prizeType: PrizeType.FREE_GIFT, label: 'FREE GIFT', color: '#D4AF37', textColor: '#111111', prizeId: pGift?.id }
+      { id: 'seg-1', prizeType: PrizeType.DISCOUNT_20, label: '20% OFF', color: '#C91F32', textColor: '#FFFFFF', prizeId: p20?.id },
+      { id: 'seg-2', prizeType: PrizeType.BETTER_LUCK, label: 'BETTER LUCK', color: '#1B1B1B', textColor: '#FFFFFF', prizeId: pBetter?.id },
+      { id: 'seg-3', prizeType: PrizeType.DISCOUNT_10, label: '10% OFF', color: '#D4AF37', textColor: '#111111', prizeId: p10?.id },
+      { id: 'seg-4', prizeType: PrizeType.TRY_AGAIN, label: 'TRY AGAIN', color: '#F5B700', textColor: '#111111', prizeId: pAgain?.id },
+      { id: 'seg-5', prizeType: PrizeType.FREE_GIFT, label: 'FREE GIFT', color: '#C91F32', textColor: '#FFFFFF', prizeId: pGift?.id },
+      { id: 'seg-6', prizeType: PrizeType.DISCOUNT_5, label: '5% OFF', color: '#1B1B1B', textColor: '#D4AF37', prizeId: p5?.id },
+      { id: 'seg-7', prizeType: PrizeType.BETTER_LUCK, label: 'BETTER LUCK', color: '#D4AF37', textColor: '#111111', prizeId: pBetter?.id },
+      { id: 'seg-8', prizeType: PrizeType.DISCOUNT_10, label: '10% OFF', color: '#C91F32', textColor: '#FFFFFF', prizeId: p10?.id }
     ];
 
     return { segments, prizes };
@@ -212,6 +212,13 @@ export class WheelService {
     const rewardExpiryDays = 30;
     const expiresAt = addDays(new Date(), rewardExpiryDays);
 
+    const isTryAgain = selectedPrize.type === PrizeType.TRY_AGAIN;
+    const isBetterLuck = selectedPrize.type === PrizeType.BETTER_LUCK || selectedPrize.type === PrizeType.NO_PRIZE;
+    const isWin = !isTryAgain && !isBetterLuck;
+
+    // For TRY_AGAIN, use a non-locking periodKey suffix so customer can spin again immediately
+    const spinPeriodKey = isTryAgain ? `${periodKey}_try_again_${Date.now()}` : periodKey;
+
     // Run within atomic database transaction with strict uniqueness constraint
     try {
       const result = await this.prisma.$transaction(async (tx) => {
@@ -228,7 +235,7 @@ export class WheelService {
           data: {
             customerId,
             campaignId: campaign!.id,
-            periodKey,
+            periodKey: spinPeriodKey,
             prizeId: selectedPrize.id,
             status: SpinStatus.COMPLETED,
             idempotencyKey,
@@ -238,8 +245,7 @@ export class WheelService {
 
         // If winning prize, create Reward voucher
         let reward = null;
-        if (selectedPrize.type !== PrizeType.NO_PRIZE) {
-          const isTshirt = selectedPrize.type === PrizeType.FREE_CUSTOM_TSHIRT;
+        if (isWin) {
           const discountPct =
             selectedPrize.type === PrizeType.DISCOUNT_20
               ? 20
@@ -249,7 +255,7 @@ export class WheelService {
               ? 5
               : null;
 
-          const isGift = selectedPrize.type === PrizeType.FREE_GIFT || isTshirt;
+          const isGift = selectedPrize.type === PrizeType.FREE_GIFT;
           const code = generateSecureRewardCode();
 
           reward = await tx.reward.create({
@@ -290,9 +296,10 @@ export class WheelService {
         prizeName: selectedPrize.name,
         description: selectedPrize.description,
         rewardCode: result.reward?.code,
-        expiresAt: result.reward?.expiresAt.toISOString(),
+        expiresAt: result.reward?.expiresAt?.toISOString(),
         segmentIndex: chosenSegmentIndex,
-        isWin: selectedPrize.type !== PrizeType.NO_PRIZE,
+        isWin,
+        isTryAgain,
         periodKey
       };
     } catch (error: any) {

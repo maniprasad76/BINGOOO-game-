@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 const routeMetaMap: Record<string, { title: string; desc: string }> = {
   '/': {
     title: 'BINGOOO | Rewards Club & Monthly Spin & Win — Srikakulam',
-    desc: 'Join BINGOOO Rewards Club in Srikakulam. Monthly Spin & Win, BINGOOO Coins, Refer & Earn, and Free Customised T-Shirts on ₹3000+ bills.'
+    desc: 'Join BINGOOO Rewards Club in Srikakulam. Monthly Spin & Win, BINGOOO Coins, Refer & Earn, and Free Surprise Gifts.'
   },
   '/club': {
     title: 'BINGOOO Rewards Club — Srikakulam Men’s Fashion',
@@ -12,7 +12,7 @@ const routeMetaMap: Record<string, { title: string; desc: string }> = {
   },
   '/spin': {
     title: 'Spin & Win Rewards Wheel | BINGOOO Srikakulam',
-    desc: 'Spin our monthly reward wheel to win 20% OFF, 10% OFF, 5% OFF, or a FREE Customised T-Shirt on ₹3000+ bills.'
+    desc: 'Spin our monthly reward wheel to win 20% OFF, 10% OFF, 5% OFF, or Free Store Surprise Gifts.'
   },
   '/club/wallet': {
     title: 'BINGOOO Coins Wallet | Loyalty Points & Vouchers',

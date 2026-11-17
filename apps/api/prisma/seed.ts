@@ -83,27 +83,23 @@ async function main() {
     }
   });
 
-  // 4. Prizes: FREE CUSTOM T-SHIRT (₹3000+ Bill), 20% OFF, 10% OFF, 5% OFF, FREE GIFT
+  // Deactivate old FREE_CUSTOM_TSHIRT prize
+  await prisma.prize.updateMany({
+    where: { type: 'FREE_CUSTOM_TSHIRT' },
+    data: { isActive: false }
+  });
+
+  // 4. Prizes: 20% OFF, 10% OFF, 5% OFF, FREE GIFT, BETTER LUCK NEXT TIME, TRY AGAIN
   const defaultPrizes = [
-    {
-      type: PrizeType.FREE_CUSTOM_TSHIRT,
-      name: 'FREE Customised T-Shirt (On ₹3000+ Bill)',
-      description: 'Shop above ₹3,000 at BINGOOO Srikakulam store & get an exclusive custom-designed premium T-Shirt completely FREE!',
-      weight: 15,
-      basisPoints: 1500,
-      color: '#C91F32', // Rich Red
-      textColor: '#FFFFFF',
-      displayOrder: 1
-    },
     {
       type: PrizeType.DISCOUNT_20,
       name: '20% OFF Mega Discount',
       description: 'Exclusive 20% OFF on all shirts, jeans, and premium collections at BINGOOO Srikakulam.',
-      weight: 15,
-      basisPoints: 1500,
-      color: '#D4AF37', // Metallic Gold
-      textColor: '#111111',
-      displayOrder: 2
+      weight: 10,
+      basisPoints: 1000,
+      color: '#C91F32', // Rich Red
+      textColor: '#FFFFFF',
+      displayOrder: 1
     },
     {
       type: PrizeType.DISCOUNT_10,
@@ -111,29 +107,49 @@ async function main() {
       description: 'Get flat 10% discount on T-shirts, Shirts, Jeans & Trousers at BINGOOO Srikakulam.',
       weight: 25,
       basisPoints: 2500,
-      color: '#1E1E1E', // Dark Charcoal
-      textColor: '#D4AF37',
-      displayOrder: 3
+      color: '#D4AF37', // Metallic Gold
+      textColor: '#111111',
+      displayOrder: 2
     },
     {
       type: PrizeType.DISCOUNT_5,
       name: '5% OFF Any Garment',
       description: 'Enjoy 5% off on your stylish purchase at BINGOOO store.',
-      weight: 25,
-      basisPoints: 2500,
+      weight: 20,
+      basisPoints: 2000,
+      color: '#1E1E1E', // Dark Charcoal
+      textColor: '#D4AF37',
+      displayOrder: 3
+    },
+    {
+      type: PrizeType.FREE_GIFT,
+      name: 'FREE Store Surprise Gift',
+      description: 'Exclusive BINGOOO branded fashion accessory / surprise gift on your store visit.',
+      weight: 15,
+      basisPoints: 1500,
       color: '#C91F32', // Rich Red
       textColor: '#FFFFFF',
       displayOrder: 4
     },
     {
-      type: PrizeType.FREE_GIFT,
-      name: 'FREE Fashion Accessory',
-      description: 'Exclusive BINGOOO branded fashion accessory / keyring on your store visit.',
-      weight: 20,
-      basisPoints: 2000,
-      color: '#D4AF37', // Metallic Gold
-      textColor: '#111111',
+      type: PrizeType.BETTER_LUCK,
+      name: 'Better Luck Next Time',
+      description: 'No prize on this spin. Visit our store or check in daily to earn reward coins!',
+      weight: 15,
+      basisPoints: 1500,
+      color: '#1E1E1E', // Dark Charcoal
+      textColor: '#FFFFFF',
       displayOrder: 5
+    },
+    {
+      type: PrizeType.TRY_AGAIN,
+      name: 'Try Again! (Free Re-Spin)',
+      description: 'You unlocked a free instant re-spin! Spin the wheel again right now.',
+      weight: 15,
+      basisPoints: 1500,
+      color: '#F5B700', // Bauhaus Yellow
+      textColor: '#111111',
+      displayOrder: 6
     }
   ];
 

@@ -3,21 +3,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AdminRole = exports.Role = exports.SpinStatus = exports.RewardStatus = exports.StoreCheckInStatus = exports.ReferralStatus = exports.LoyaltyTransactionType = exports.RewardSourceType = exports.RewardType = exports.PrizeType = void 0;
 var PrizeType;
 (function (PrizeType) {
-    PrizeType["FREE_CUSTOM_TSHIRT"] = "FREE_CUSTOM_TSHIRT";
     PrizeType["DISCOUNT_20"] = "DISCOUNT_20";
     PrizeType["DISCOUNT_10"] = "DISCOUNT_10";
     PrizeType["DISCOUNT_5"] = "DISCOUNT_5";
     PrizeType["FREE_GIFT"] = "FREE_GIFT";
+    PrizeType["BETTER_LUCK"] = "BETTER_LUCK";
+    PrizeType["TRY_AGAIN"] = "TRY_AGAIN";
     PrizeType["NO_PRIZE"] = "NO_PRIZE";
+    PrizeType["FREE_CUSTOM_TSHIRT"] = "FREE_CUSTOM_TSHIRT";
 })(PrizeType || (exports.PrizeType = PrizeType = {}));
 var RewardType;
 (function (RewardType) {
-    RewardType["FREE_CUSTOM_TSHIRT"] = "FREE_CUSTOM_TSHIRT";
     RewardType["DISCOUNT_20"] = "DISCOUNT_20";
     RewardType["DISCOUNT_10"] = "DISCOUNT_10";
     RewardType["DISCOUNT_5"] = "DISCOUNT_5";
     RewardType["FREE_GIFT"] = "FREE_GIFT";
     RewardType["COINS_VOUCHER"] = "COINS_VOUCHER";
+    RewardType["FREE_CUSTOM_TSHIRT"] = "FREE_CUSTOM_TSHIRT";
 })(RewardType || (exports.RewardType = RewardType = {}));
 var RewardSourceType;
 (function (RewardSourceType) {

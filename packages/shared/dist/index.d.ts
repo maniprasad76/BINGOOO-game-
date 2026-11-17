@@ -1,18 +1,20 @@
 export declare enum PrizeType {
-    FREE_CUSTOM_TSHIRT = "FREE_CUSTOM_TSHIRT",
     DISCOUNT_20 = "DISCOUNT_20",
     DISCOUNT_10 = "DISCOUNT_10",
     DISCOUNT_5 = "DISCOUNT_5",
     FREE_GIFT = "FREE_GIFT",
-    NO_PRIZE = "NO_PRIZE"
+    BETTER_LUCK = "BETTER_LUCK",
+    TRY_AGAIN = "TRY_AGAIN",
+    NO_PRIZE = "NO_PRIZE",
+    FREE_CUSTOM_TSHIRT = "FREE_CUSTOM_TSHIRT"
 }
 export declare enum RewardType {
-    FREE_CUSTOM_TSHIRT = "FREE_CUSTOM_TSHIRT",
     DISCOUNT_20 = "DISCOUNT_20",
     DISCOUNT_10 = "DISCOUNT_10",
     DISCOUNT_5 = "DISCOUNT_5",
     FREE_GIFT = "FREE_GIFT",
-    COINS_VOUCHER = "COINS_VOUCHER"
+    COINS_VOUCHER = "COINS_VOUCHER",
+    FREE_CUSTOM_TSHIRT = "FREE_CUSTOM_TSHIRT"
 }
 export declare enum RewardSourceType {
     SPIN = "SPIN",
@@ -90,6 +92,7 @@ export interface WheelSpinResponse {
     expiresAt?: string;
     segmentIndex: number;
     isWin: boolean;
+    isTryAgain?: boolean;
     periodKey: string;
 }
 export interface CustomerSessionDto {

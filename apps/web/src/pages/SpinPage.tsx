@@ -139,13 +139,13 @@ export const SpinPage: React.FC = () => {
       <div className="bg-[#121212] border-3 border-white p-6 sm:p-10 flex flex-col items-center relative overflow-hidden shadow-[8px_8px_0px_0px_#F5B700]">
         <div className="text-center mb-6 space-y-1">
           <div className="inline-block px-2.5 py-0.5 bg-[#C91F32] text-white text-[10px] font-mono font-bold tracking-widest uppercase border border-white mb-1">
-            VERIFIED PROBABILITY ENGINE // 100% WIN RATE
+            VERIFIED PROBABILITY ENGINE // MONTHLY FESTIVE WHEEL
           </div>
           <h2 className="text-2xl sm:text-4xl font-black font-display uppercase tracking-widest text-white">
             BINGOOO <span className="text-[#C91F32]">SPIN & WIN</span>
           </h2>
           <p className="text-xs sm:text-sm text-gray-400 font-sans">
-            Spin the Bauhaus wheel to win 20% OFF, Free Customised T-Shirts on ₹3000+ bills, or Gifts.
+            Spin the Bauhaus wheel to win 20% OFF, 10% OFF, 5% OFF, or Free Store Surprise Gifts.
           </p>
         </div>
 
@@ -158,17 +158,27 @@ export const SpinPage: React.FC = () => {
         )}
       </div>
 
-      {/* Winning / Result Bauhaus Modal */}
+      {/* Result Bauhaus Modal */}
       {spinResult && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fade-in">
           <div className="bg-[#161616] border-4 border-white p-6 sm:p-8 max-w-md w-full text-center space-y-6 shadow-[10px_10px_0px_0px_#C91F32] relative">
-            <div className="w-14 h-14 bg-[#C91F32] border-2 border-white text-white flex items-center justify-center mx-auto shadow-[3px_3px_0px_0px_#F5B700]">
-              <Sparkles className="w-7 h-7 text-[#F5B700]" />
+            <div className={`w-14 h-14 border-2 border-white flex items-center justify-center mx-auto shadow-[3px_3px_0px_0px_#F5B700] ${
+              spinResult.isTryAgain
+                ? 'bg-[#F5B700] text-black'
+                : spinResult.isWin
+                ? 'bg-[#C91F32] text-white'
+                : 'bg-[#1E1E1E] text-gray-300'
+            }`}>
+              <Sparkles className="w-7 h-7" />
             </div>
 
             <div>
               <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#F5B700] bg-[#1F1F1F] px-2 py-0.5 border border-[#444]">
-                ★ CONGRATULATIONS WINNER ★
+                {spinResult.isTryAgain
+                  ? '★ BONUS RE-SPIN UNLOCKED ★'
+                  : spinResult.isWin
+                  ? '★ CONGRATULATIONS WINNER ★'
+                  : '★ THANK YOU FOR PLAYING ★'}
               </span>
               <h3 className="text-2xl sm:text-3xl font-black font-display uppercase tracking-wide text-white mt-3">
                 {spinResult.prizeName}
@@ -178,6 +188,7 @@ export const SpinPage: React.FC = () => {
               </p>
             </div>
 
+            {/* Winning Voucher Display */}
             {spinResult.rewardCode && (
               <div className="p-4 bg-[#0A0A0A] border-2 border-white space-y-2 shadow-[4px_4px_0px_0px_#F5B700]">
                 <span className="text-[10px] uppercase font-mono tracking-widest text-gray-400 block">
@@ -197,12 +208,23 @@ export const SpinPage: React.FC = () => {
                 </div>
                 {copied && <span className="text-[11px] text-emerald-400 font-mono font-bold block">CODE COPIED TO CLIPBOARD!</span>}
                 <p className="text-[10px] text-gray-400 pt-1 font-mono">
-                  Valid for 30 days at BINGOOO Men's Wear, Main Road, Srikakulam.
+                  Valid for 30 days at BINGOOO Men's Wear, NH16, Kushalpuram, Srikakulam.
                 </p>
               </div>
             )}
 
+            {/* Action Buttons */}
             <div className="flex flex-col gap-3">
+              {spinResult.isTryAgain && (
+                <button
+                  onClick={() => setSpinResult(null)}
+                  className="w-full py-3.5 bg-[#F5B700] hover:bg-[#DBA300] text-black font-mono font-black text-xs uppercase tracking-widest transition-all border-2 border-black shadow-[3px_3px_0px_0px_#FFFFFF] hover:translate-x-0.5 hover:translate-y-0.5 flex items-center justify-center space-x-2"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>SPIN AGAIN NOW ↻</span>
+                </button>
+              )}
+
               {spinResult.rewardCode && (
                 <Link
                   to={`/reward/${spinResult.rewardCode}`}
@@ -211,11 +233,21 @@ export const SpinPage: React.FC = () => {
                   VIEW REWARD VOUCHER →
                 </Link>
               )}
+
+              {!spinResult.isTryAgain && !spinResult.isWin && (
+                <Link
+                  to="/club"
+                  className="w-full py-3 bg-[#C91F32] hover:bg-[#B01828] text-white font-mono font-black text-xs uppercase tracking-widest transition-all border-2 border-white shadow-[3px_3px_0px_0px_#F5B700]"
+                >
+                  VISIT REWARDS CLUB & COINS →
+                </Link>
+              )}
+
               <button
                 onClick={() => setSpinResult(null)}
-                className="w-full py-3 bg-[#242424] hover:bg-[#2F2F2F] text-gray-300 font-mono font-bold text-xs uppercase tracking-widest transition border border-[#444]"
+                className="w-full py-2.5 bg-[#242424] hover:bg-[#2F2F2F] text-gray-300 font-mono font-bold text-xs uppercase tracking-widest transition border border-[#444]"
               >
-                [ CLOSE WINDOW ]
+                [ CLOSE ]
               </button>
             </div>
           </div>

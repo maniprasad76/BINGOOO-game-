@@ -77,17 +77,17 @@ export const LandingPage: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {/* FREE CUSTOMISED T-SHIRT (₹3000+ Bill) */}
-          <div className="p-5 rounded-2xl bg-[#161616] border-2 border-[#C91F32] hover:border-[#D4AF37] transition space-y-3 relative overflow-hidden group shadow-xl shadow-[#C91F32]/10">
-            <div className="w-10 h-10 rounded-xl bg-[#C91F32]/20 border border-[#C91F32]/30 flex items-center justify-center text-[#C91F32]">
-              <ShoppingBag className="w-5 h-5" />
+          {/* TRY AGAIN (Free Re-Spin) */}
+          <div className="p-5 rounded-2xl bg-[#161616] border-2 border-[#F5B700] hover:border-white transition space-y-3 relative overflow-hidden group shadow-xl shadow-[#F5B700]/10">
+            <div className="w-10 h-10 rounded-xl bg-[#F5B700]/20 border border-[#F5B700]/30 flex items-center justify-center text-[#F5B700]">
+              <Sparkles className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-white font-display">FREE Customised T-Shirt</h3>
+            <h3 className="text-base font-bold text-white font-display">Try Again! (Re-Spin)</h3>
             <p className="text-[11px] text-gray-300 leading-relaxed">
-              Buy above ₹3,000+ bill & receive an exclusive premium custom-designed BINGOOO T-Shirt completely free!
+              Land on Try Again and unlock an instant free re-spin! Keep the excitement spinning.
             </p>
-            <span className="inline-block text-[10px] font-bold text-[#D4AF37] uppercase tracking-wider bg-[#D4AF37]/10 px-2 py-0.5 rounded border border-[#D4AF37]/30">
-              ₹3000+ Bill Exclusive
+            <span className="inline-block text-[10px] font-bold text-[#F5B700] uppercase tracking-wider bg-[#F5B700]/10 px-2 py-0.5 rounded border border-[#F5B700]/30">
+              Instant Free Spin
             </span>
           </div>
 

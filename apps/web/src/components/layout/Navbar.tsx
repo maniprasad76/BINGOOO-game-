@@ -71,6 +71,16 @@ export const Navbar: React.FC = () => {
             Spin & Win
           </Link>
           <Link
+            to="/club/scratch"
+            className={`transition py-1 border-b-2 ${
+              location.pathname === '/club/scratch'
+                ? 'text-[#F5B700] border-[#F5B700]'
+                : 'text-gray-300 hover:text-white border-transparent hover:border-[#F5B700]'
+            }`}
+          >
+            Scratch Card
+          </Link>
+          <Link
             to="/club/wallet"
             className={`transition py-1 border-b-2 ${
               location.pathname === '/club/wallet'
@@ -238,12 +248,12 @@ export const Navbar: React.FC = () => {
               <span>Refer Friends</span>
             </Link>
             <Link
-              to="/club/check-in"
+              to="/club/scratch"
               onClick={closeMenu}
-              className="flex items-center space-x-2 p-2.5 bg-[#181818] hover:bg-[#222222] text-xs font-bold uppercase tracking-wide border-2 border-[#2E2E2E]"
+              className="flex items-center space-x-2 p-2.5 bg-[#181818] hover:bg-[#222222] text-xs font-bold uppercase tracking-wide border-2 border-[#2E2E2E] shadow-[2px_2px_0px_0px_#F5B700]"
             >
-              <QrCode className="w-3.5 h-3.5 text-purple-400" />
-              <span>QR Check-in</span>
+              <Sparkles className="w-3.5 h-3.5 text-[#F5B700]" />
+              <span>Scratch Card</span>
             </Link>
             <Link
               to="/club/birthday"

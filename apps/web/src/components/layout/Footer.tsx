@@ -50,6 +50,7 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2 text-xs text-gray-400">
               <li><Link to="/club" className="hover:text-white transition">→ Rewards Club Hub</Link></li>
               <li><Link to="/spin" className="hover:text-white transition">→ Monthly Spin & Win</Link></li>
+              <li><Link to="/club/scratch" className="hover:text-white transition text-[#F5B700]">→ Spin Scratch Card</Link></li>
               <li><Link to="/club/wallet" className="hover:text-white transition">→ Coins Wallet & Ledger</Link></li>
               <li><Link to="/rewards" className="hover:text-white transition">→ My Reward Vouchers</Link></li>
               <li><Link to="/how-it-works" className="hover:text-white transition">→ How It Works</Link></li>

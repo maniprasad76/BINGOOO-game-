@@ -22,9 +22,13 @@ const routeMetaMap: Record<string, { title: string; desc: string }> = {
     title: 'Refer & Earn 50 Coins | BINGOOO Srikakulam',
     desc: 'Invite friends to BINGOOO. They get 5% OFF, and you earn 50 BINGOOO Coins on their first purchase!'
   },
-  '/club/check-in': {
-    title: 'In-Store QR Check-in | BINGOOO Srikakulam',
-    desc: 'Scan our store QR code at Main Road, Srikakulam to earn daily visit reward coins.'
+  '/club/scratch': {
+    title: 'Monthly Spin Scratch Card | BINGOOO Srikakulam',
+    desc: 'Scratch to reveal your monthly Spin & Win prize, store discount vouchers, and claim details.'
+  },
+  '/scratch': {
+    title: 'Monthly Spin Scratch Card | BINGOOO Srikakulam',
+    desc: 'Scratch to reveal your monthly Spin & Win prize, store discount vouchers, and claim details.'
   },
   '/club/birthday': {
     title: 'Annual Birthday Celebration | BINGOOO Rewards',

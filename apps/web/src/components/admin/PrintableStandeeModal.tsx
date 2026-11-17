@@ -15,7 +15,7 @@ export const PrintableStandeeModal: React.FC<PrintableStandeeModalProps> = ({
   onClose,
   storeName = "BINGOOO MEN'S WEAR",
   storeAddress = "NH16, Kushalpuram, Srikakulam District, Andhra Pradesh — 532410",
-  checkInUrl = "https://bingooo.co.in/club/check-in"
+  checkInUrl = "https://bingooo.co.in/club/scratch"
 }) => {
   const [qrDataUrl, setQrDataUrl] = useState<string>('');
 
@@ -88,13 +88,13 @@ export const PrintableStandeeModal: React.FC<PrintableStandeeModalProps> = ({
           <div className="space-y-1">
             <div className="inline-flex items-center space-x-1.5 bg-[#F5B700] px-4 py-1.5 border-2 border-black font-mono font-black text-sm uppercase">
               <Sparkles className="w-4 h-4 text-black" />
-              <span>EARN 5 COINS DAILY</span>
+              <span>SPIN & WIN SCRATCH CARD</span>
             </div>
             <h2 className="text-2xl font-black font-display uppercase tracking-tight text-black pt-2">
-              SCAN TO CHECK IN
+              SCAN TO REVEAL REWARD
             </h2>
             <p className="text-xs text-gray-700 max-w-xs mx-auto">
-              Open your smartphone camera to scan, check in, and collect reward coins towards store discounts!
+              Scan with your smartphone camera to reveal your monthly Spin & Win prize, discount vouchers & free gifts!
             </p>
           </div>
 

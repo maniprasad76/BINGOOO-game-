@@ -182,29 +182,29 @@ export const RewardsClubHubPage: React.FC = () => {
             </div>
           </Link>
 
-          {/* Tile 4: Store QR Check-in */}
+          {/* Tile 4: Spin Scratch Card */}
           <Link
-            to="/club/check-in"
-            className="p-6 bg-[#161616] border-2 border-[#333333] hover:border-white hover:translate-x-1 hover:translate-y-1 transition-all group space-y-4 relative overflow-hidden shadow-[5px_5px_0px_0px_#C91F32]"
+            to="/club/scratch"
+            className="p-6 bg-[#161616] border-2 border-[#333333] hover:border-white hover:translate-x-1 hover:translate-y-1 transition-all group space-y-4 relative overflow-hidden shadow-[5px_5px_0px_0px_#F5B700]"
           >
             <div className="flex items-center justify-between">
-              <div className="w-10 h-10 bg-[#C91F32] border-2 border-white text-white flex items-center justify-center font-mono font-black text-sm">
+              <div className="w-10 h-10 bg-[#F5B700] border-2 border-white text-black flex items-center justify-center font-mono font-black text-sm">
                 04
               </div>
-              <span className="text-xs font-mono font-bold text-[#F5B700] bg-[#1F1F1F] px-2 py-0.5 border border-[#444]">
-                +5 COINS/VISIT
+              <span className="text-xs font-mono font-bold text-white bg-[#C91F32] px-2 py-0.5 border border-white">
+                SCRATCH & REVEAL
               </span>
             </div>
             <div>
-              <h3 className="text-lg font-black text-white uppercase font-display tracking-wide">
-                Store QR Check-in
+              <h3 className="text-lg font-black text-white uppercase font-display tracking-wide group-hover:text-[#F5B700] transition-colors">
+                Spin Scratch Card
               </h3>
               <p className="text-xs text-gray-400 mt-2 leading-relaxed">
-                Visiting our Srikakulam store? Scan the counter QR code and earn 5 check-in Coins once daily with staff approval.
+                Scratch off the golden foil to uncover your monthly Spin & Win prize, store discount voucher code, or claim your free spin!
               </p>
             </div>
-            <div className="pt-2 text-xs font-mono font-bold text-[#C91F32] flex items-center space-x-1 uppercase tracking-wider">
-              <span>[ CHECK IN IN-STORE ]</span>
+            <div className="pt-2 text-xs font-mono font-bold text-[#F5B700] flex items-center space-x-1 uppercase tracking-wider">
+              <span>[ SCRATCH TO REVEAL ]</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </div>
           </Link>

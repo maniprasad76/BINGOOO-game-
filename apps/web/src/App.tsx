@@ -6,7 +6,7 @@ import { usePageMeta } from './hooks/usePageMeta';
 import { RewardsClubHubPage } from './pages/club/RewardsClubHubPage';
 import { CoinsWalletPage } from './pages/club/CoinsWalletPage';
 import { ReferralsPage } from './pages/club/ReferralsPage';
-import { StoreCheckInPage } from './pages/club/StoreCheckInPage';
+import { ScratchCardPage } from './pages/club/ScratchCardPage';
 import { BirthdayRewardsPage } from './pages/club/BirthdayRewardsPage';
 import { CustomerLoginPage } from './pages/CustomerLoginPage';
 import { SpinPage } from './pages/SpinPage';
@@ -59,7 +59,9 @@ export const App: React.FC = () => {
                     <Route path="/club" element={<RewardsClubHubPage />} />
                     <Route path="/club/wallet" element={<CoinsWalletPage />} />
                     <Route path="/club/refer" element={<ReferralsPage />} />
-                    <Route path="/club/check-in" element={<StoreCheckInPage />} />
+                    <Route path="/club/scratch" element={<ScratchCardPage />} />
+                    <Route path="/scratch" element={<ScratchCardPage />} />
+                    <Route path="/club/check-in" element={<Navigate to="/club/scratch" replace />} />
                     <Route path="/club/birthday" element={<BirthdayRewardsPage />} />
                     <Route path="/spin" element={<SpinPage />} />
                     <Route path="/login" element={<CustomerLoginPage />} />

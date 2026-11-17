@@ -70,7 +70,7 @@ export const CoinsWalletPage: React.FC = () => {
           </p>
           <p>• Store Spend: 1 Coin / ₹10</p>
           <p>• Refer Friends: 50 Coins / friend</p>
-          <p>• Daily QR Visit: 5 Coins / check-in</p>
+          <p>• Spin & Scratch Card: Exclusive Monthly Discounts</p>
           <p>• Birthday Gift: 50 Coins annual pass</p>
         </div>
       </div>

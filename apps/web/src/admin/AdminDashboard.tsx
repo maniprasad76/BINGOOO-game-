@@ -575,7 +575,7 @@ export const AdminDashboard: React.FC = () => {
       <PrintableStandeeModal
         isOpen={standeeModalOpen}
         onClose={() => setStandeeModalOpen(false)}
-        checkInUrl={`${window.location.origin}/club/check-in`}
+        checkInUrl={`${window.location.origin}/club/scratch`}
       />
     </div>
   );

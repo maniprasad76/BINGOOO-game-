@@ -54,10 +54,37 @@ export class EmailLoginDto {
   displayName?: string;
 }
 
+export class GoogleLoginDto {
+  @IsNotEmpty()
+  @IsString()
+  email: string;
+
+  @IsOptional()
+  @IsString()
+  displayName?: string;
+
+  @IsOptional()
+  @IsString()
+  googleId?: string;
+
+  @IsOptional()
+  @IsString()
+  avatarUrl?: string;
+}
+
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Post('google')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Customer sign in or sign up using Google' })
+  async googleLogin(@Body() dto: GoogleLoginDto, @Req() req: any) {
+    const ip = req.ip || req.headers['x-forwarded-for'];
+    const ua = req.headers['user-agent'];
+    return this.authService.loginWithGoogle(dto.email, dto.displayName, dto.googleId, dto.avatarUrl, ip, ua);
+  }
 
   @Post('email-login')
   @HttpCode(HttpStatus.OK)

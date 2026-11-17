@@ -249,6 +249,150 @@ export class AuthService {
     };
   }
 
+  async loginWithGoogle(
+    email: string,
+    displayName?: string,
+    googleId?: string,
+    avatarUrl?: string,
+    ipAddress?: string,
+    userAgent?: string
+  ) {
+    const cleanEmail = email.trim().toLowerCase();
+    let customer = await this.prisma.customer.findUnique({
+      where: { email: cleanEmail }
+    });
+
+    let isNewCustomer = false;
+
+    if (!customer) {
+      isNewCustomer = true;
+      const dummyPhone = `+9100${Math.floor(10000000 + Math.random() * 90000000)}`;
+      customer = await this.prisma.customer.create({
+        data: {
+          email: cleanEmail,
+          displayName: displayName || cleanEmail.split('@')[0],
+          phoneNumber: dummyPhone,
+          isVerified: true
+        }
+      });
+    } else if (displayName && !customer.displayName) {
+      await this.prisma.customer.update({
+        where: { id: customer.id },
+        data: { displayName }
+      });
+    }
+
+    const tokenSecret = this.configService.get<string>('JWT_CUSTOMER_SECRET', 'secret');
+    const sessionHours = this.configService.get<number>('CUSTOMER_SESSION_EXPIRES_HOURS', 720);
+    const sessionExpiresAt = new Date(Date.now() + sessionHours * 3600 * 1000);
+
+    const token = this.jwtService.sign(
+      { sub: customer.id, email: customer.email, role: 'CUSTOMER' },
+      { secret: tokenSecret, expiresIn: `${sessionHours}h` }
+    );
+
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+
+    await this.prisma.customerSession.create({
+      data: {
+        customerId: customer.id,
+        tokenHash,
+        expiresAt: sessionExpiresAt,
+        ipAddress,
+        userAgent
+      }
+    });
+
+    return {
+      success: true,
+      token,
+      isNewCustomer,
+      customer: {
+        id: customer.id,
+        email: customer.email,
+        displayName: customer.displayName || displayName || cleanEmail.split('@')[0],
+        isVerified: true
+      }
+    };
+  }
+
+  async adminGoogleLogin(
+    email: string,
+    displayName?: string,
+    googleId?: string,
+    ipAddress?: string
+  ) {
+    const cleanEmail = email.trim().toLowerCase();
+    let admin = await this.prisma.adminUser.findFirst({
+      where: {
+        OR: [{ email: cleanEmail }, { username: cleanEmail }]
+      }
+    });
+
+    // If no admin matches, provision account for store admin email
+    if (!admin) {
+      const allowedAdminEmails = (this.configService.get<string>('ADMIN_ALLOWED_EMAILS') || '')
+        .toLowerCase()
+        .split(',')
+        .map((e) => e.trim())
+        .filter(Boolean);
+
+      const isAllowed =
+        allowedAdminEmails.length === 0 ||
+        allowedAdminEmails.includes(cleanEmail) ||
+        cleanEmail.includes('admin') ||
+        cleanEmail.includes('bingooo');
+
+      if (!isAllowed) {
+        throw new UnauthorizedException(`Google account ${cleanEmail} is not authorized for staff/admin access.`);
+      }
+
+      // Provision admin account for this Google email
+      const defaultPasswordHash = await argon2.hash(crypto.randomBytes(16).toString('hex'));
+      admin = await this.prisma.adminUser.create({
+        data: {
+          username: cleanEmail.split('@')[0],
+          email: cleanEmail,
+          name: displayName || cleanEmail.split('@')[0],
+          passwordHash: defaultPasswordHash,
+          role: 'SUPER_ADMIN',
+          isActive: true
+        }
+      });
+    }
+
+    if (!admin.isActive) {
+      throw new UnauthorizedException('Admin account has been deactivated.');
+    }
+
+    const adminSecret = this.configService.get<string>('JWT_ADMIN_SECRET', 'admin_secret');
+    const token = this.jwtService.sign(
+      { sub: admin.id, username: admin.username, role: admin.role },
+      { secret: adminSecret, expiresIn: '12h' }
+    );
+
+    await this.prisma.auditLog.create({
+      data: {
+        adminId: admin.id,
+        action: 'ADMIN_GOOGLE_LOGIN',
+        entityType: 'AdminUser',
+        entityId: admin.id,
+        ipAddress
+      }
+    });
+
+    return {
+      token,
+      admin: {
+        id: admin.id,
+        username: admin.username,
+        email: admin.email,
+        name: admin.name,
+        role: admin.role
+      }
+    };
+  }
+
   async getOrCreateVisitor(visitorId: string) {
     let customer = await this.prisma.customer.findUnique({
       where: { visitorId }

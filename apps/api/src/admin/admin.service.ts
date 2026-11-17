@@ -157,9 +157,17 @@ export class AdminService {
     return { total, page, limit, data };
   }
 
-  async getRewards(page = 1, limit = 20, status?: string) {
+  async getRewards(page = 1, limit = 50, status?: string, prizeType?: string) {
     const skip = (page - 1) * limit;
-    const where = status ? { status: status as any } : {};
+    const where: any = {};
+    if (status && status !== 'ALL') where.status = status as any;
+    if (prizeType && prizeType !== 'ALL') {
+      if (prizeType === 'GIFTS_ONLY') {
+        where.prize = { type: { in: ['FREE_CUSTOM_TSHIRT', 'FREE_GIFT'] } };
+      } else {
+        where.prize = { type: prizeType };
+      }
+    }
 
     const [total, data] = await Promise.all([
       this.prisma.reward.count({ where }),
@@ -168,7 +176,7 @@ export class AdminService {
         skip,
         take: limit,
         include: {
-          customer: { select: { phoneNumber: true } },
+          customer: { select: { id: true, phoneNumber: true, email: true, displayName: true } },
           prize: true,
           redemption: { include: { staff: { select: { name: true, username: true } } } }
         },

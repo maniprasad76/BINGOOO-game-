@@ -1,153 +1,174 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
-  Users,
-  Sparkles,
   Gift,
   CheckCircle2,
-  Settings,
-  ShieldAlert,
-  LogOut,
-  RefreshCw,
+  Clock,
   Search,
   Check,
   AlertTriangle,
   FileText,
   Printer,
   QrCode,
-  Camera
+  LogOut,
+  RefreshCw,
+  Sparkles,
+  Shirt,
+  ShieldCheck,
+  Copy,
+  User,
+  Phone,
+  Mail,
+  Calendar,
+  Tag
 } from 'lucide-react';
 import { ApiClient } from '../services/api.service';
 import { PrintableStandeeModal } from '../components/admin/PrintableStandeeModal';
 
 export const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'redemptions' | 'prizes' | 'spins' | 'customers' | 'settings'>('overview');
 
-  const [metrics, setMetrics] = useState<any>(null);
+  // Primary gift winners list
+  const [giftWinners, setGiftWinners] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ISSUED' | 'REDEEMED'>('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
-  // Redemption state
+  // Quick Redemption Section
   const [redeemCode, setRedeemCode] = useState('');
   const [billNumber, setBillNumber] = useState('');
   const [redeemNotes, setRedeemNotes] = useState('');
+  const [redeemLoading, setRedeemLoading] = useState(false);
   const [redeemStatus, setRedeemStatus] = useState<any>(null);
   const [redeemError, setRedeemError] = useState<string | null>(null);
 
   // Standee Modal
   const [standeeModalOpen, setStandeeModalOpen] = useState(false);
 
-  // Prizes state
-  const [prizes, setPrizes] = useState<any[]>([]);
-  const [prizeSuccess, setPrizeSuccess] = useState<string | null>(null);
-
-  // History states
-  const [spinsList, setSpinsList] = useState<any[]>([]);
-  const [customersList, setCustomersList] = useState<any[]>([]);
-  const [settingsList, setSettingsList] = useState<any[]>([]);
+  // Selected winner for quick handover modal
+  const [selectedWinner, setSelectedWinner] = useState<any | null>(null);
 
   const adminUser = JSON.parse(localStorage.getItem('bingooo_admin_user') || '{}');
 
-  const loadDashboard = async () => {
+  const loadGiftWinners = async () => {
     try {
       setLoading(true);
-      const [dash, pz, sp, cs, st] = await Promise.all([
-        ApiClient.getAdminDashboard(),
-        ApiClient.getAdminPrizes(),
-        ApiClient.getAdminSpins(1),
-        ApiClient.getAdminCustomers(1),
-        ApiClient.getAdminSettings()
-      ]);
-      setMetrics(dash);
-      setPrizes(pz || []);
-      setSpinsList(sp?.data || []);
-      setCustomersList(cs?.data || []);
-      setSettingsList(st || []);
-    } catch (err) {
-      console.error(err);
-      navigate('/admin/login');
+      // Fetch gifts only: FREE_GIFT and FREE_CUSTOM_TSHIRT
+      const res = await ApiClient.getAdminRewards(1, statusFilter, 'GIFTS_ONLY');
+      setGiftWinners(res?.data || []);
+    } catch (err: any) {
+      console.error('Failed to load gift winners', err);
+      if (err.status === 401 || err.message?.includes('Unauthorized')) {
+        navigate('/admin/login');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadDashboard();
-  }, []);
+    loadGiftWinners();
+  }, [statusFilter]);
 
   const handleLogout = () => {
     ApiClient.logoutAdmin();
     navigate('/admin/login');
   };
 
-  const handleRedeem = async (e: React.FormEvent) => {
+  const handleCopy = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
+  const handleRedeemSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setRedeemError(null);
     setRedeemStatus(null);
+    setRedeemLoading(true);
 
-    const fullNotes = billNumber ? `Invoice #${billNumber}. ${redeemNotes}` : redeemNotes;
+    const fullNotes = billNumber ? `Invoice #${billNumber}. ${redeemNotes}`.trim() : redeemNotes;
 
     try {
-      const res = await ApiClient.redeemVoucher(redeemCode, fullNotes);
+      const res = await ApiClient.redeemVoucher(redeemCode.trim().toUpperCase(), fullNotes);
       setRedeemStatus(res);
       setRedeemCode('');
       setBillNumber('');
       setRedeemNotes('');
-      loadDashboard();
+      setSelectedWinner(null);
+      await loadGiftWinners();
     } catch (err: any) {
-      setRedeemError(err.message || 'Redemption failed');
+      setRedeemError(err.message || 'Voucher redemption failed. Please verify code.');
+    } finally {
+      setRedeemLoading(false);
     }
   };
 
-  const handleSavePrizes = async () => {
-    try {
-      setPrizeSuccess(null);
-      await ApiClient.updateAdminPrizes(prizes);
-      setPrizeSuccess('Prize probabilities updated successfully!');
-      loadDashboard();
-    } catch (err: any) {
-      alert(err.message || 'Failed to update prizes');
-    }
+  const handleQuickHandover = (winner: any) => {
+    setSelectedWinner(winner);
+    setRedeemCode(winner.code);
+    setRedeemError(null);
+    setRedeemStatus(null);
+    // Scroll smoothly to quick redemption box
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handlePrizeWeightChange = (id: string, weightStr: string) => {
-    const val = parseInt(weightStr, 10) || 0;
-    setPrizes((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, weight: val, basisPoints: val * 100 } : p))
-    );
-  };
+  // Filter winners by search query
+  const filteredWinners = giftWinners.filter((winner) => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return true;
+    const name = winner.customer?.displayName?.toLowerCase() || '';
+    const phone = winner.customer?.phoneNumber?.toLowerCase() || '';
+    const email = winner.customer?.email?.toLowerCase() || '';
+    const code = winner.code?.toLowerCase() || '';
+    const prizeName = winner.prize?.name?.toLowerCase() || '';
+    return name.includes(q) || phone.includes(q) || email.includes(q) || code.includes(q) || prizeName.includes(q);
+  });
 
-  const totalConfiguredWeight = prizes
-    .filter((p) => p.isActive)
-    .reduce((sum, p) => sum + p.weight, 0);
+  const totalGiftsCount = giftWinners.length;
+  const pendingCount = giftWinners.filter((w) => w.status === 'ISSUED').length;
+  const redeemedCount = giftWinners.filter((w) => w.status === 'REDEEMED').length;
 
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-gray-200">
-      {/* Admin Topbar */}
-      <header className="bg-[#141414] border-b border-[#222222] px-6 py-4 flex items-center justify-between">
+      {/* Bauhaus Topbar */}
+      <header className="bg-[#141414] border-b-2 border-white px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center space-x-3">
-          <span className="text-xl font-black text-white font-display tracking-wider">
-            BINGO<span className="text-[#C91F32]">OO</span>
-          </span>
-          <span className="px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30 text-xs font-bold uppercase tracking-widest">
-            {adminUser.role || 'STAFF'} PORTAL
-          </span>
+          <div className="w-10 h-10 bg-[#C91F32] border-2 border-white flex items-center justify-center shadow-[3px_3px_0px_0px_#FFFFFF]">
+            <Gift className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className="text-xl font-black text-white font-display tracking-wider">
+                BINGO<span className="text-[#C91F32]">OO</span>
+              </span>
+              <span className="px-2 py-0.5 bg-[#F5B700] text-black border border-black text-[10px] font-mono font-black uppercase tracking-wider">
+                GIFT WINNERS DESK
+              </span>
+            </div>
+            <p className="text-[11px] font-mono text-gray-400">
+              Srikakulam Store // In-Store Free Gift & T-Shirt Claim Counter
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center space-x-3">
           <button
             onClick={() => setStandeeModalOpen(true)}
-            className="flex items-center space-x-1.5 px-3 py-1.5 bg-[#F5B700] hover:bg-[#DBA300] text-black font-mono font-bold text-xs uppercase tracking-wider transition-all border border-black shadow-[2px_2px_0px_0px_#FFFFFF]"
+            className="flex items-center space-x-2 px-3.5 py-2 bg-[#F5B700] hover:bg-[#DBA300] text-black font-mono font-bold text-xs uppercase tracking-wider transition-all border-2 border-white shadow-[3px_3px_0px_0px_#FFFFFF] hover:translate-x-0.5 hover:translate-y-0.5"
           >
-            <Printer className="w-3.5 h-3.5" />
+            <Printer className="w-4 h-4" />
             <span>PRINT COUNTER STANDEE</span>
           </button>
-          <span className="text-xs text-gray-400 hidden sm:inline">
-            Signed in as: <strong className="text-white">{adminUser.name || 'Admin'}</strong>
+
+          <span className="text-xs font-mono text-gray-300 hidden md:inline">
+            Admin: <strong className="text-white">{adminUser.name || 'Store Cashier'}</strong>
           </span>
+
           <button
             onClick={handleLogout}
-            className="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-[#222222] hover:bg-[#333333] text-xs text-gray-300 transition"
+            className="flex items-center space-x-1 px-3 py-2 bg-[#222222] hover:bg-[#333333] border border-white text-xs font-mono text-gray-200 transition"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
@@ -155,394 +176,394 @@ export const AdminDashboard: React.FC = () => {
         </div>
       </header>
 
-      {/* Admin Tabs */}
-      <div className="border-b border-[#1F1F1F] bg-[#111111] px-6 flex space-x-6 overflow-x-auto text-xs font-semibold uppercase tracking-wider">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className={`py-3.5 border-b-2 transition ${
-            activeTab === 'overview' ? 'border-[#C91F32] text-white' : 'border-transparent text-gray-400 hover:text-white'
-          }`}
-        >
-          Dashboard Overview
-        </button>
-        <button
-          onClick={() => setActiveTab('redemptions')}
-          className={`py-3.5 border-b-2 transition ${
-            activeTab === 'redemptions' ? 'border-[#C91F32] text-white' : 'border-transparent text-gray-400 hover:text-white'
-          }`}
-        >
-          Redeem Voucher (Staff)
-        </button>
-        {adminUser.role === 'SUPER_ADMIN' && (
-          <button
-            onClick={() => setActiveTab('prizes')}
-            className={`py-3.5 border-b-2 transition ${
-              activeTab === 'prizes' ? 'border-[#C91F32] text-white' : 'border-transparent text-gray-400 hover:text-white'
-            }`}
-          >
-            Prize Probabilities
-          </button>
-        )}
-        <button
-          onClick={() => setActiveTab('spins')}
-          className={`py-3.5 border-b-2 transition ${
-            activeTab === 'spins' ? 'border-[#C91F32] text-white' : 'border-transparent text-gray-400 hover:text-white'
-          }`}
-        >
-          Spins History
-        </button>
-        <button
-          onClick={() => setActiveTab('customers')}
-          className={`py-3.5 border-b-2 transition ${
-            activeTab === 'customers' ? 'border-[#C91F32] text-white' : 'border-transparent text-gray-400 hover:text-white'
-          }`}
-        >
-          Verified Customers
-        </button>
-      </div>
-
-      {/* Main Body */}
-      <main className="p-6 max-w-7xl mx-auto space-y-8">
-        {/* OVERVIEW TAB */}
-        {activeTab === 'overview' && metrics && (
-          <div className="space-y-6">
-            {/* KPI Cards */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="p-5 rounded-2xl bg-[#141414] border border-[#222222]">
-                <span className="text-[11px] text-gray-400 uppercase tracking-wider block">Total Customers</span>
-                <span className="text-2xl font-bold font-display text-white mt-1 block">
-                  {metrics.totalCustomers}
-                </span>
-                <span className="text-[10px] text-emerald-400">{metrics.verifiedCustomers} Verified Numbers</span>
-              </div>
-
-              <div className="p-5 rounded-2xl bg-[#141414] border border-[#222222]">
-                <span className="text-[11px] text-gray-400 uppercase tracking-wider block">Spins This Month</span>
-                <span className="text-2xl font-bold font-display text-white mt-1 block">
-                  {metrics.spinsTotal}
-                </span>
-                <span className="text-[10px] text-[#D4AF37]">{metrics.spinsToday} Today</span>
-              </div>
-
-              <div className="p-5 rounded-2xl bg-[#141414] border border-[#222222]">
-                <span className="text-[11px] text-gray-400 uppercase tracking-wider block">Active Vouchers</span>
-                <span className="text-2xl font-bold font-display text-emerald-400 mt-1 block">
-                  {metrics.rewardCounts.issued}
-                </span>
-                <span className="text-[10px] text-gray-400">{metrics.rewardCounts.redeemed} Redeemed</span>
-              </div>
-
-              <div className="p-5 rounded-2xl bg-[#141414] border border-[#222222]">
-                <span className="text-[11px] text-gray-400 uppercase tracking-wider block">Gift Inventory</span>
-                <span className="text-2xl font-bold font-display text-[#D4AF37] mt-1 block">
-                  {metrics.totalGiftStockRemaining}
-                </span>
-                <span className="text-[10px] text-gray-400">Available Stock</span>
-              </div>
+      {/* Main Content Area */}
+      <main className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
+        {/* KPI Counter Badges */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="p-4 bg-[#141414] border-2 border-white shadow-[4px_4px_0px_0px_#0047AB]">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono font-bold text-gray-400 uppercase tracking-wider">
+                TOTAL GIFT WINNERS
+              </span>
+              <Gift className="w-5 h-5 text-[#0047AB]" />
             </div>
-
-            {/* Prize Outcomes Summary */}
-            <div className="p-6 rounded-3xl bg-[#141414] border border-[#222222] space-y-4">
-              <h3 className="text-base font-bold text-white font-display uppercase tracking-wide">
-                Cumulative Prize Distribution
-              </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-                <div className="p-4 rounded-xl bg-[#191919] border border-[#262626]">
-                  <span className="text-xs text-gray-400 block">10% OFF Bill</span>
-                  <span className="text-xl font-bold text-[#C91F32] mt-1 block">{metrics.prizeCounts.discount10}</span>
-                </div>
-                <div className="p-4 rounded-xl bg-[#191919] border border-[#262626]">
-                  <span className="text-xs text-gray-400 block">5% OFF Bill</span>
-                  <span className="text-xl font-bold text-[#D4AF37] mt-1 block">{metrics.prizeCounts.discount5}</span>
-                </div>
-                <div className="p-4 rounded-xl bg-[#191919] border border-[#262626]">
-                  <span className="text-xs text-gray-400 block">Free Gifts Won</span>
-                  <span className="text-xl font-bold text-emerald-400 mt-1 block">{metrics.prizeCounts.freeGift}</span>
-                </div>
-                <div className="p-4 rounded-xl bg-[#191919] border border-[#262626]">
-                  <span className="text-xs text-gray-400 block">Next Month Chances</span>
-                  <span className="text-xl font-bold text-gray-400 mt-1 block">{metrics.prizeCounts.noPrize}</span>
-                </div>
-              </div>
-            </div>
+            <span className="text-3xl font-black font-display text-white mt-2 block">
+              {totalGiftsCount}
+            </span>
+            <span className="text-[10px] font-mono text-gray-400">
+              Free Gifts & ₹3000+ Bill T-Shirts
+            </span>
           </div>
-        )}
 
-        {/* REDEMPTION TAB */}
-        {activeTab === 'redemptions' && (
-          <div className="max-w-xl mx-auto space-y-6">
-            <div className="p-6 rounded-3xl bg-[#141414] border border-[#222222] space-y-5">
+          <div className="p-4 bg-[#141414] border-2 border-white shadow-[4px_4px_0px_0px_#F5B700]">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono font-bold text-[#F5B700] uppercase tracking-wider">
+                PENDING HANDOVER
+              </span>
+              <Clock className="w-5 h-5 text-[#F5B700]" />
+            </div>
+            <span className="text-3xl font-black font-display text-[#F5B700] mt-2 block">
+              {pendingCount}
+            </span>
+            <span className="text-[10px] font-mono text-gray-400">
+              Awaiting customer in-store collection
+            </span>
+          </div>
+
+          <div className="p-4 bg-[#141414] border-2 border-white shadow-[4px_4px_0px_0px_#00A86B]">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono font-bold text-[#00A86B] uppercase tracking-wider">
+                HANDED OVER & REDEEMED
+              </span>
+              <CheckCircle2 className="w-5 h-5 text-[#00A86B]" />
+            </div>
+            <span className="text-3xl font-black font-display text-[#00A86B] mt-2 block">
+              {redeemedCount}
+            </span>
+            <span className="text-[10px] font-mono text-gray-400">
+              Successfully fulfilled at cash counter
+            </span>
+          </div>
+        </div>
+
+        {/* CASHIER QUICK REDEMPTION DESK */}
+        <div className="p-5 sm:p-6 bg-[#161616] border-3 border-white shadow-[6px_6px_0px_0px_#C91F32] space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#333333] pb-3">
+            <div>
+              <h3 className="text-lg font-black font-display uppercase tracking-wider text-white flex items-center space-x-2">
+                <span>Cashier Handover Desk</span>
+                <span className="text-xs font-mono font-bold px-2 py-0.5 bg-[#C91F32] text-white">
+                  VERIFY & DISPENSE
+                </span>
+              </h3>
+              <p className="text-xs text-gray-400 font-sans">
+                Scan QR or enter voucher code from winner's phone to verify and mark gift handed over.
+              </p>
+            </div>
+            {selectedWinner && (
+              <span className="text-xs font-mono bg-[#F5B700] text-black px-2.5 py-1 font-bold border border-black">
+                SELECTED: {selectedWinner.code} ({selectedWinner.prize?.name})
+              </span>
+            )}
+          </div>
+
+          {redeemStatus && (
+            <div className="p-4 bg-emerald-950/70 border-2 border-emerald-500 text-emerald-100 flex items-start space-x-3 font-mono">
+              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
               <div>
-                <h3 className="text-lg font-bold font-display uppercase text-white">
-                  Staff In-Store Voucher Redemption
-                </h3>
-                <p className="text-xs text-gray-400 mt-1">
-                  Enter or scan the customer's BGO coupon code to validate and apply their discount.
+                <p className="font-bold text-sm">GIFT REDEEMED SUCCESSFULLY!</p>
+                <p className="text-xs text-emerald-200 mt-1">
+                  Voucher: <strong>{redeemStatus.reward?.code}</strong> | Prize: <strong>{redeemStatus.reward?.prize?.name}</strong>
+                </p>
+                <p className="text-[11px] text-emerald-300">
+                  Customer: {redeemStatus.reward?.customer?.displayName || 'Customer'} ({redeemStatus.reward?.customer?.phoneNumber || redeemStatus.reward?.customer?.email || 'Store User'})
                 </p>
               </div>
+            </div>
+          )}
 
-              {redeemError && (
-                <div className="p-3 rounded-xl bg-red-950/40 border border-red-800 text-xs text-red-200">
-                  {redeemError}
-                </div>
-              )}
+          {redeemError && (
+            <div className="p-4 bg-red-950/70 border-2 border-red-500 text-red-100 flex items-start space-x-3 font-mono">
+              <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold text-sm">REDEMPTION REJECTED</p>
+                <p className="text-xs text-red-200 mt-0.5">{redeemError}</p>
+              </div>
+            </div>
+          )}
 
-              {redeemStatus && (
-                <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-800 text-xs text-emerald-200 space-y-1">
-                  <p className="font-bold text-sm">VOUCHER REDEEMED SUCCESSFULLY!</p>
-                  <p>Code: <strong className="font-mono">{redeemStatus.reward?.code}</strong></p>
-                  <p>Applied to: {redeemStatus.redemption?.storeLocation}</p>
-                </div>
-              )}
+          <form onSubmit={handleRedeemSubmit} className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+            <div className="sm:col-span-1">
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-gray-300 mb-1">
+                VOUCHER CODE *
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. BG-WIN-XXXX"
+                value={redeemCode}
+                onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
+                required
+                className="w-full px-3.5 py-2.5 bg-[#0A0A0A] border-2 border-white text-white font-mono font-bold text-sm focus:outline-none focus:border-[#F5B700] uppercase"
+              />
+            </div>
 
-              <form onSubmit={handleRedeem} className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400">
-                      Coupon Code (Format: BGO-XXXX-XXXX)
-                    </label>
-                    <label className="text-[11px] text-[#F5B700] hover:underline cursor-pointer flex items-center space-x-1 font-mono">
-                      <Camera className="w-3.5 h-3.5" />
-                      <span>Scan / Upload QR</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        capture="environment"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            // If a cashier takes a photo of customer's screen
-                            alert(`Voucher image (${file.name}) selected. If manual verification needed, copy the code visible on screen.`);
-                          }
-                        }}
-                      />
-                    </label>
-                  </div>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={redeemCode}
-                      onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
-                      placeholder="BGO-A8F2-9X7K"
-                      required
-                      className="w-full px-4 py-3 bg-[#0E0E0E] border-2 border-[#2A2A2A] rounded-xl text-white font-mono text-lg font-bold tracking-wider focus:outline-none focus:border-white transition"
-                    />
-                  </div>
-                </div>
+            <div className="sm:col-span-1">
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-gray-300 mb-1">
+                BILL / INVOICE # (REQ FOR ₹3000+ T-SHIRT)
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. INV-2026-8841"
+                value={billNumber}
+                onChange={(e) => setBillNumber(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-[#0A0A0A] border-2 border-[#333333] text-white font-mono text-sm focus:outline-none focus:border-white"
+              />
+            </div>
 
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
-                    Store Invoice / Bill Receipt # (Mandatory for ₹3000+ T-Shirt)
-                  </label>
-                  <input
-                    type="text"
-                    value={billNumber}
-                    onChange={(e) => setBillNumber(e.target.value)}
-                    placeholder="e.g. INV-2026-8941"
-                    className="w-full px-4 py-2.5 bg-[#0E0E0E] border border-[#2A2A2A] rounded-xl text-white font-mono text-xs focus:outline-none focus:border-gray-500 transition"
-                  />
-                  <p className="text-[10px] text-amber-400/90 mt-1 font-mono">
-                    * If redeeming FREE Customised T-Shirt, verify billing amount is above ₹3,000.
-                  </p>
-                </div>
+            <div className="sm:col-span-1">
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-gray-300 mb-1">
+                HANDOVER NOTES (OPTIONAL)
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Size L handed over"
+                value={redeemNotes}
+                onChange={(e) => setRedeemNotes(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-[#0A0A0A] border-2 border-[#333333] text-white font-mono text-sm focus:outline-none focus:border-white"
+              />
+            </div>
 
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
-                    Staff Notes / Garment Details (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    value={redeemNotes}
-                    onChange={(e) => setRedeemNotes(e.target.value)}
-                    placeholder="Size L - Black Graphic T-Shirt handed over"
-                    className="w-full px-4 py-2.5 bg-[#0E0E0E] border border-[#2A2A2A] rounded-xl text-white text-xs focus:outline-none focus:border-gray-500 transition"
-                  />
-                </div>
+            <div className="sm:col-span-1">
+              <button
+                type="submit"
+                disabled={redeemLoading || !redeemCode}
+                className="w-full py-2.5 bg-[#C91F32] hover:bg-[#B01828] text-white font-mono font-black text-xs uppercase tracking-widest transition-all border-2 border-white shadow-[3px_3px_0px_0px_#F5B700] hover:translate-x-0.5 hover:translate-y-0.5 flex items-center justify-center space-x-2 disabled:opacity-50"
+              >
+                {redeemLoading ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <Check className="w-4 h-4" />
+                    <span>VERIFY & HAND OVER</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
 
-                <button
-                  type="submit"
-                  className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-mono font-black text-xs uppercase tracking-widest transition-all border-2 border-white shadow-[3px_3px_0px_0px_#FFFFFF] hover:translate-x-0.5 hover:translate-y-0.5"
-                >
-                  VALIDATE & REDEEM VOUCHER →
-                </button>
-              </form>
+        {/* FREE GIFT WINNERS LIST SECTION */}
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-black font-display uppercase tracking-wider text-white">
+                Free Gift & T-Shirt Winners
+              </h2>
+              <p className="text-xs font-mono text-gray-400">
+                Only customers who won physical gifts are listed here for store fulfillment.
+              </p>
+            </div>
+
+            {/* Filter Tabs */}
+            <div className="flex items-center space-x-2 bg-[#141414] p-1 border-2 border-white">
+              <button
+                onClick={() => setStatusFilter('ALL')}
+                className={`px-3 py-1.5 text-xs font-mono font-bold uppercase transition ${
+                  statusFilter === 'ALL'
+                    ? 'bg-white text-black'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                ALL ({totalGiftsCount})
+              </button>
+              <button
+                onClick={() => setStatusFilter('ISSUED')}
+                className={`px-3 py-1.5 text-xs font-mono font-bold uppercase transition ${
+                  statusFilter === 'ISSUED'
+                    ? 'bg-[#F5B700] text-black'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                PENDING ({pendingCount})
+              </button>
+              <button
+                onClick={() => setStatusFilter('REDEEMED')}
+                className={`px-3 py-1.5 text-xs font-mono font-bold uppercase transition ${
+                  statusFilter === 'REDEEMED'
+                    ? 'bg-[#00A86B] text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                CLAIMED ({redeemedCount})
+              </button>
             </div>
           </div>
-        )}
 
-        {/* PRIZE PROBABILITIES TAB */}
-        {activeTab === 'prizes' && adminUser.role === 'SUPER_ADMIN' && (
-          <div className="space-y-6">
-            <div className="p-6 rounded-3xl bg-[#141414] border border-[#222222] space-y-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                <div>
-                  <h3 className="text-lg font-bold font-display uppercase text-white">
-                    Prize Probabilities Engine
-                  </h3>
-                  <p className="text-xs text-gray-400">
-                    Weights must strictly total 100% (10,000 basis points). Changes affect future spins only.
-                  </p>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${
-                  totalConfiguredWeight === 100
-                    ? 'bg-emerald-950 text-emerald-400 border-emerald-800'
-                    : 'bg-red-950 text-red-400 border-red-800'
-                }`}>
-                  Total Weight: {totalConfiguredWeight}% / 100%
-                </div>
-              </div>
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-3.5" />
+            <input
+              type="text"
+              placeholder="Search by customer name, phone number, email, or voucher code..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-[#141414] border-2 border-white text-white font-mono text-xs focus:outline-none focus:border-[#F5B700] transition"
+            />
+          </div>
 
-              {prizeSuccess && (
-                <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-800 text-xs text-emerald-200">
-                  {prizeSuccess}
-                </div>
-              )}
+          {/* Winners Cards / List */}
+          {loading ? (
+            <div className="p-12 text-center bg-[#141414] border-2 border-white">
+              <RefreshCw className="w-8 h-8 text-[#F5B700] animate-spin mx-auto mb-2" />
+              <p className="text-xs font-mono text-gray-400 uppercase tracking-widest">
+                LOADING GIFT WINNERS...
+              </p>
+            </div>
+          ) : filteredWinners.length === 0 ? (
+            <div className="p-12 text-center bg-[#141414] border-2 border-dashed border-[#333333]">
+              <Gift className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+              <h4 className="text-sm font-bold font-mono text-gray-300 uppercase">
+                NO GIFT WINNERS FOUND
+              </h4>
+              <p className="text-xs text-gray-500 mt-1">
+                {searchQuery
+                  ? 'No results matched your search term.'
+                  : 'No customers have won this gift category yet.'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredWinners.map((winner) => {
+                const isTshirt = winner.prize?.type === 'FREE_CUSTOM_TSHIRT';
+                const isPending = winner.status === 'ISSUED';
+                const isRedeemed = winner.status === 'REDEEMED';
 
-              <div className="space-y-3 pt-2">
-                {prizes.map((p) => (
+                return (
                   <div
-                    key={p.id}
-                    className="p-4 rounded-xl bg-[#181818] border border-[#262626] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                    key={winner.id}
+                    className={`bg-[#141414] border-2 border-white p-5 space-y-4 relative transition hover:translate-x-0.5 hover:translate-y-0.5 ${
+                      isPending
+                        ? 'shadow-[4px_4px_0px_0px_#F5B700]'
+                        : 'shadow-[4px_4px_0px_0px_#00A86B]'
+                    }`}
                   >
-                    <div>
-                      <span className="text-sm font-bold text-white block">{p.name}</span>
-                      <span className="text-xs text-gray-400 block">{p.description}</span>
-                    </div>
-
-                    <div className="flex items-center space-x-3 shrink-0">
-                      <div className="flex items-center space-x-1">
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={p.weight}
-                          onChange={(e) => handlePrizeWeightChange(p.id, e.target.value)}
-                          className="w-16 px-2.5 py-1.5 bg-[#111111] border border-[#2A2A2A] rounded-lg text-white font-mono text-sm text-center focus:outline-none focus:border-[#C91F32]"
-                        />
-                        <span className="text-xs text-gray-400">%</span>
+                    {/* Header with Prize Type */}
+                    <div className="flex items-start justify-between gap-2 border-b border-[#262626] pb-3">
+                      <div className="flex items-center space-x-2">
+                        <div
+                          className={`w-9 h-9 border border-white flex items-center justify-center shrink-0 ${
+                            isTshirt ? 'bg-[#0047AB] text-white' : 'bg-[#C91F32] text-white'
+                          }`}
+                        >
+                          {isTshirt ? <Shirt className="w-5 h-5" /> : <Gift className="w-5 h-5" />}
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-mono font-bold uppercase tracking-wider block text-gray-400">
+                            {isTshirt ? '₹3000+ BILL QUALIFIED' : 'STORE GIFT'}
+                          </span>
+                          <h4 className="font-display font-black text-sm text-white uppercase leading-snug">
+                            {winner.prize?.name || 'Free Gift'}
+                          </h4>
+                        </div>
                       </div>
 
-                      <label className="flex items-center space-x-1.5 text-xs text-gray-300 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={p.isActive}
-                          onChange={(e) => {
-                            const val = e.target.checked;
-                            setPrizes((prev) =>
-                              prev.map((item) => (item.id === p.id ? { ...item, isActive: val } : item))
-                            );
-                          }}
-                          className="rounded border-[#2A2A2A] bg-[#111111] text-[#C91F32]"
-                        />
-                        <span>Active</span>
-                      </label>
+                      <span
+                        className={`px-2 py-0.5 text-[10px] font-mono font-black uppercase tracking-wider border ${
+                          isPending
+                            ? 'bg-[#F5B700] text-black border-black'
+                            : isRedeemed
+                            ? 'bg-[#00A86B] text-white border-white'
+                            : 'bg-gray-800 text-gray-400 border-gray-600'
+                        }`}
+                      >
+                        {winner.status}
+                      </span>
                     </div>
+
+                    {/* Customer Info */}
+                    <div className="space-y-1.5 text-xs font-mono">
+                      <div className="flex items-center space-x-2 text-white">
+                        <User className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                        <span className="font-bold">
+                          {winner.customer?.displayName || winner.customer?.phoneNumber || winner.customer?.email || 'Store Customer'}
+                        </span>
+                      </div>
+                      {winner.customer?.phoneNumber && (
+                        <div className="flex items-center space-x-2 text-gray-300">
+                          <Phone className="w-3.5 h-3.5 text-gray-500 shrink-0" />
+                          <span>{winner.customer.phoneNumber}</span>
+                        </div>
+                      )}
+                      {winner.customer?.email && (
+                        <div className="flex items-center space-x-2 text-gray-300 truncate">
+                          <Mail className="w-3.5 h-3.5 text-gray-500 shrink-0" />
+                          <span className="truncate">{winner.customer.email}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Voucher Code Box */}
+                    <div className="p-2.5 bg-[#0A0A0A] border border-[#333333] flex items-center justify-between">
+                      <div>
+                        <span className="text-[9px] font-mono text-gray-500 uppercase tracking-widest block">
+                          VOUCHER CODE
+                        </span>
+                        <span className="text-sm font-mono font-black text-[#F5B700] tracking-wider">
+                          {winner.code}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleCopy(winner.code)}
+                        className="p-1.5 bg-[#1F1F1F] hover:bg-[#333333] text-gray-300 border border-[#444444] transition"
+                        title="Copy code"
+                      >
+                        {copiedCode === winner.code ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Dates & Redemption Details */}
+                    <div className="text-[10px] font-mono text-gray-400 space-y-1 border-t border-[#222222] pt-2">
+                      <div className="flex items-center justify-between">
+                        <span>Won on:</span>
+                        <span className="text-gray-300">
+                          {new Date(winner.createdAt).toLocaleDateString('en-IN', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Expires on:</span>
+                        <span className="text-gray-300">
+                          {new Date(winner.expiresAt).toLocaleDateString('en-IN', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                      {isRedeemed && winner.redemption && (
+                        <div className="pt-1 border-t border-[#222222] text-emerald-400">
+                          <span>
+                            Verified by: {winner.redemption.staff?.name || winner.redemption.staff?.username || 'Staff'}
+                          </span>
+                          {winner.redemption.notes && (
+                            <p className="text-[9px] text-gray-400 mt-0.5 truncate">
+                              {winner.redemption.notes}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action button if pending */}
+                    {isPending && (
+                      <button
+                        onClick={() => handleQuickHandover(winner)}
+                        className="w-full py-2.5 bg-[#F5B700] hover:bg-[#DBA300] text-black font-mono font-black text-xs uppercase tracking-wider transition-all border border-black shadow-[2px_2px_0px_0px_#FFFFFF] hover:translate-x-0.5 hover:translate-y-0.5 flex items-center justify-center space-x-1.5"
+                      >
+                        <Check className="w-4 h-4" />
+                        <span>DISPENSE GIFT IN STORE</span>
+                      </button>
+                    )}
                   </div>
-                ))}
-              </div>
-
-              <div className="pt-4">
-                <button
-                  onClick={handleSavePrizes}
-                  disabled={totalConfiguredWeight !== 100}
-                  className="px-6 py-3 rounded-xl bg-[#C91F32] hover:bg-[#A81525] text-white font-bold text-xs uppercase tracking-wider transition disabled:opacity-50"
-                >
-                  SAVE & PERSIST PROBABILITY SNAPSHOT
-                </button>
-              </div>
+                );
+              })}
             </div>
-          </div>
-        )}
-
-        {/* SPINS HISTORY TAB */}
-        {activeTab === 'spins' && (
-          <div className="p-6 rounded-3xl bg-[#141414] border border-[#222222] space-y-4">
-            <h3 className="text-lg font-bold font-display uppercase text-white">
-              Customer Spin Records
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-gray-300">
-                <thead className="bg-[#1B1B1B] text-gray-400 uppercase tracking-wider text-[10px]">
-                  <tr>
-                    <th className="p-3">Period</th>
-                    <th className="p-3">Phone</th>
-                    <th className="p-3">Outcome</th>
-                    <th className="p-3">Reward Code</th>
-                    <th className="p-3">Spin Time</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#222222]">
-                  {spinsList.map((s) => (
-                    <tr key={s.id} className="hover:bg-[#181818]">
-                      <td className="p-3 font-mono font-bold text-gray-400">{s.periodKey}</td>
-                      <td className="p-3 font-mono text-white">{s.customer?.phoneNumber}</td>
-                      <td className="p-3">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                          s.prize?.type !== 'NO_PRIZE' ? 'bg-[#C91F32]/20 text-[#C91F32]' : 'bg-gray-800 text-gray-400'
-                        }`}>
-                          {s.prize?.name}
-                        </span>
-                      </td>
-                      <td className="p-3 font-mono text-[#D4AF37]">{s.reward?.code || '—'}</td>
-                      <td className="p-3 text-gray-400">{new Date(s.completedAt).toLocaleString()}</td>
-                    </tr>
-                  ))}
-                  {spinsList.length === 0 && (
-                    <tr>
-                      <td colSpan={5} className="p-6 text-center text-gray-500">
-                        No spin attempts recorded yet.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* CUSTOMERS TAB */}
-        {activeTab === 'customers' && (
-          <div className="p-6 rounded-3xl bg-[#141414] border border-[#222222] space-y-4">
-            <h3 className="text-lg font-bold font-display uppercase text-white">
-              Verified Customer Directory
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs text-gray-300">
-                <thead className="bg-[#1B1B1B] text-gray-400 uppercase tracking-wider text-[10px]">
-                  <tr>
-                    <th className="p-3">Customer ID</th>
-                    <th className="p-3">Phone Number</th>
-                    <th className="p-3">Status</th>
-                    <th className="p-3">Spins</th>
-                    <th className="p-3">Joined Date</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#222222]">
-                  {customersList.map((c) => (
-                    <tr key={c.id} className="hover:bg-[#181818]">
-                      <td className="p-3 font-mono text-gray-500">{c.id.slice(0, 8)}...</td>
-                      <td className="p-3 font-mono text-white font-semibold">{c.phoneNumber}</td>
-                      <td className="p-3">
-                        <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[10px] font-bold">
-                          {c.isVerified ? 'VERIFIED' : 'PENDING'}
-                        </span>
-                      </td>
-                      <td className="p-3 text-white font-bold">{c._count?.spins || 0}</td>
-                      <td className="p-3 text-gray-400">{new Date(c.createdAt).toLocaleDateString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </main>
 
-      {/* Printable In-Store Standee Modal */}
+      {/* Printable Counter Standee Modal */}
       <PrintableStandeeModal
         isOpen={standeeModalOpen}
         onClose={() => setStandeeModalOpen(false)}
+        checkInUrl={`${window.location.origin}/club/check-in`}
       />
     </div>
   );

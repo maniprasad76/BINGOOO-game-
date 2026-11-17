@@ -33,6 +33,20 @@ export class AdminLoginRequestDto {
   password: string;
 }
 
+export class AdminGoogleLoginDto {
+  @IsNotEmpty()
+  @IsString()
+  email: string;
+
+  @IsOptional()
+  @IsString()
+  displayName?: string;
+
+  @IsOptional()
+  @IsString()
+  googleId?: string;
+}
+
 export class RedeemVoucherDto {
   @IsNotEmpty()
   @IsString()
@@ -66,6 +80,14 @@ export class AdminController {
   async login(@Body() dto: AdminLoginRequestDto, @Req() req: any) {
     const ip = req.ip || req.headers['x-forwarded-for'];
     return this.authService.adminLogin(dto.username, dto.password, ip);
+  }
+
+  @Post('auth/google')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Admin staff login with Google' })
+  async googleLogin(@Body() dto: AdminGoogleLoginDto, @Req() req: any) {
+    const ip = req.ip || req.headers['x-forwarded-for'];
+    return this.authService.adminGoogleLogin(dto.email, dto.displayName, dto.googleId, ip);
   }
 
   @Get('auth/me')
@@ -129,12 +151,14 @@ export class AdminController {
   async getRewards(
     @Query('page') page?: string,
     @Query('limit') limit?: string,
-    @Query('status') status?: string
+    @Query('status') status?: string,
+    @Query('prizeType') prizeType?: string
   ) {
     return this.adminService.getRewards(
       page ? parseInt(page, 10) : 1,
-      limit ? parseInt(limit, 10) : 20,
-      status
+      limit ? parseInt(limit, 10) : 50,
+      status,
+      prizeType
     );
   }
 

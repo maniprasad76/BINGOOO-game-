@@ -59,6 +59,20 @@ export class ApiClient {
     return res;
   }
 
+  // Customer Google Login
+  static async loginWithGoogle(email: string, displayName?: string, googleId?: string, avatarUrl?: string) {
+    const res = await this.request('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ email, displayName, googleId, avatarUrl })
+    });
+    if (res.token) {
+      localStorage.setItem('bingooo_customer_token', res.token);
+      localStorage.setItem('bingooo_customer_email', res.customer.email);
+      localStorage.setItem('bingooo_customer_name', res.customer.displayName || '');
+    }
+    return res;
+  }
+
   // Customer Auth
   static async requestOtp(phoneNumber: string, marketingConsent = false) {
     return this.request('/auth/otp/request', {
@@ -225,6 +239,18 @@ export class ApiClient {
     return res;
   }
 
+  static async adminGoogleLogin(email: string, displayName?: string, googleId?: string) {
+    const res = await this.request('/admin/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ email, displayName, googleId })
+    });
+    if (res.token) {
+      localStorage.setItem('bingooo_admin_token', res.token);
+      localStorage.setItem('bingooo_admin_user', JSON.stringify(res.admin));
+    }
+    return res;
+  }
+
   static async getAdminDashboard() {
     return this.request('/admin/dashboard', {}, true);
   }
@@ -239,9 +265,13 @@ export class ApiClient {
     return this.request(`/admin/spins${query}`, {}, true);
   }
 
-  static async getAdminRewards(page = 1, status?: string) {
-    const query = status ? `?page=${page}&status=${status}` : `?page=${page}`;
-    return this.request(`/admin/rewards${query}`, {}, true);
+  static async getAdminRewards(page = 1, status?: string, prizeType?: string) {
+    const params = new URLSearchParams();
+    params.set('page', page.toString());
+    params.set('limit', '50');
+    if (status && status !== 'ALL') params.set('status', status);
+    if (prizeType && prizeType !== 'ALL') params.set('prizeType', prizeType);
+    return this.request(`/admin/rewards?${params.toString()}`, {}, true);
   }
 
   static async redeemVoucher(code: string, notes?: string) {

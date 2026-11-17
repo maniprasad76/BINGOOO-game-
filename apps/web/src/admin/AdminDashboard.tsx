@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   Gift,
   CheckCircle2,
@@ -141,15 +141,19 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <span className="text-xl font-black text-white font-display tracking-wider">
-                BINGO<span className="text-[#C91F32]">OO</span>
-              </span>
+              <Link
+                to="/"
+                className="text-xl font-black text-white font-display tracking-wider hover:text-[#F5B700] transition group flex items-center space-x-1"
+                title="Return to bingooo.co.in store"
+              >
+                <span>BINGO<span className="text-[#C91F32]">OO</span><span className="text-xs text-[#F5B700] font-mono lowercase">.co.in</span></span>
+              </Link>
               <span className="px-2 py-0.5 bg-[#F5B700] text-black border border-black text-[10px] font-mono font-black uppercase tracking-wider">
                 GIFT WINNERS DESK
               </span>
             </div>
             <p className="text-[11px] font-mono text-gray-400">
-              Srikakulam Store // In-Store Free Gift & T-Shirt Claim Counter
+              Srikakulam Store // In-Store Free Gift Claim Counter
             </p>
           </div>
         </div>

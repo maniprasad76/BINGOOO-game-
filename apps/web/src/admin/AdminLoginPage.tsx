@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ShieldCheck, Lock, User, RefreshCw, AlertCircle, ArrowRight } from 'lucide-react';
 import { ApiClient } from '../services/api.service';
 import { GoogleSignInButton } from '../components/auth/GoogleSignInButton';
@@ -131,6 +131,16 @@ export const AdminLoginPage: React.FC = () => {
             )}
           </button>
         </form>
+
+        <div className="pt-2 text-center">
+          <Link
+            to="/"
+            className="text-xs font-mono font-bold text-[#F5B700] hover:text-white transition tracking-wider underline"
+            title="Go to bingooo.co.in"
+          >
+            ← RETURN TO BINGOOO.CO.IN STORE
+          </Link>
+        </div>
       </div>
     </div>
   );

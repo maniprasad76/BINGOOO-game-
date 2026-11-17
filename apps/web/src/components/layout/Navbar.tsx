@@ -25,17 +25,20 @@ export const Navbar: React.FC = () => {
   return (
     <header className="sticky top-0 z-50 bg-[#0F0F0F] border-b-2 border-[#282828] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Bauhaus Geometric Brand Logo */}
-        <Link to="/" onClick={closeMenu} className="flex items-center space-x-2.5 group">
+        {/* Bauhaus Geometric Brand Logo - Redirects to homepage on click */}
+        <Link to="/" onClick={closeMenu} className="flex items-center space-x-2.5 group" title="bingooo.co.in">
           <div className="w-8 h-8 bg-[#C91F32] border-2 border-white flex items-center justify-center font-black text-sm tracking-tighter text-white shadow-[2px_2px_0px_0px_#F5B700] group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-transform">
             B
           </div>
-          <span className="text-2xl font-black tracking-widest text-white font-display uppercase">
-            BINGO<span className="text-[#C91F32]">OO</span>
-          </span>
-          <span className="text-[10px] px-2 py-0.5 bg-[#1F1F1F] text-[#F5B700] font-mono tracking-widest uppercase border border-[#3A3A3A]">
-            SRIKAKULAM
-          </span>
+          <div className="flex flex-col text-left leading-none">
+            <span className="text-xl sm:text-2xl font-black tracking-widest text-white font-display uppercase group-hover:text-[#F5B700] transition-colors">
+              BINGO<span className="text-[#C91F32]">OO</span>
+              <span className="text-xs font-mono font-bold text-[#F5B700] lowercase tracking-normal">.co.in</span>
+            </span>
+            <span className="text-[9px] text-gray-400 font-mono tracking-wider hidden sm:block">
+              SRIKAKULAM // MEN'S WEAR
+            </span>
+          </div>
         </Link>
 
         {/* Desktop Navigation Links */}

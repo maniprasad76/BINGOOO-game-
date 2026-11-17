@@ -126,13 +126,15 @@ export const CustomerLoginPage: React.FC = () => {
         <div className="pt-2 text-center text-xs font-mono text-gray-500 space-y-2">
           <span>NO PHONE OTP REQUIRED // INSTANT SESSION</span>
           <div>
-            <Link
-              to="/"
-              className="text-[11px] font-mono font-bold text-[#F5B700] hover:underline"
-              title="Return to bingooo.co.in"
+            <a
+              href="https://www.bingooo.co.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] font-mono font-bold text-[#F5B700] hover:underline inline-flex items-center space-x-1"
+              title="Return to official bingooo.co.in store"
             >
-              ← RETURN TO BINGOOO.CO.IN STORE
-            </Link>
+              <span>← RETURN TO BINGOOO.CO.IN STORE ↗</span>
+            </a>
           </div>
         </div>
       </div>

@@ -9,7 +9,8 @@ import {
   MapPin,
   ArrowRight,
   ShieldCheck,
-  Gift
+  Gift,
+  ExternalLink
 } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
@@ -44,6 +45,16 @@ export const LandingPage: React.FC = () => {
             <Sparkles className="w-5 h-5 text-[#D4AF37]" />
             <span>SPIN NOW</span>
           </Link>
+          <a
+            href="https://www.bingooo.co.in"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto px-6 py-4 rounded-xl bg-[#1A1A1A] hover:bg-[#252525] border border-[#F5B700]/50 text-[#F5B700] hover:text-white font-bold text-base transition flex items-center justify-center space-x-2 shadow-lg"
+            title="Visit official clothing store website"
+          >
+            <ShoppingBag className="w-4 h-4 text-[#F5B700]" />
+            <span>VISIT BINGOOO.CO.IN STORE ↗</span>
+          </a>
           <Link
             to="/how-it-works"
             className="w-full sm:w-auto px-6 py-4 rounded-xl bg-[#1A1A1A] hover:bg-[#252525] border border-[#2A2A2A] text-gray-200 font-semibold text-base transition flex items-center justify-center space-x-2"

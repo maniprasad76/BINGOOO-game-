@@ -133,13 +133,15 @@ export const AdminLoginPage: React.FC = () => {
         </form>
 
         <div className="pt-2 text-center">
-          <Link
-            to="/"
-            className="text-xs font-mono font-bold text-[#F5B700] hover:text-white transition tracking-wider underline"
-            title="Go to bingooo.co.in"
+          <a
+            href="https://www.bingooo.co.in"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-mono font-bold text-[#F5B700] hover:text-white transition tracking-wider underline inline-flex items-center space-x-1"
+            title="Go to official bingooo.co.in store"
           >
-            ← RETURN TO BINGOOO.CO.IN STORE
-          </Link>
+            <span>← RETURN TO BINGOOO.CO.IN STORE ↗</span>
+          </a>
         </div>
       </div>
     </div>

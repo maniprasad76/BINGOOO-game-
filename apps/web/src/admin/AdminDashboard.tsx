@@ -141,13 +141,15 @@ export const AdminDashboard: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <Link
-                to="/"
+              <a
+                href="https://www.bingooo.co.in"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-xl font-black text-white font-display tracking-wider hover:text-[#F5B700] transition group flex items-center space-x-1"
-                title="Return to bingooo.co.in store"
+                title="Return to official bingooo.co.in store"
               >
-                <span>BINGO<span className="text-[#C91F32]">OO</span><span className="text-xs text-[#F5B700] font-mono lowercase">.co.in</span></span>
-              </Link>
+                <span>BINGO<span className="text-[#C91F32]">OO</span><span className="text-xs text-[#F5B700] font-mono lowercase">.co.in ↗</span></span>
+              </a>
               <span className="px-2 py-0.5 bg-[#F5B700] text-black border border-black text-[10px] font-mono font-black uppercase tracking-wider">
                 GIFT WINNERS DESK
               </span>

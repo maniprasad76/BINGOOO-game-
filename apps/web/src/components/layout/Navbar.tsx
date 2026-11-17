@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Sparkles, Gift, Clock, LogOut, User, Menu, X, Coins, Share2, QrCode, Cake } from 'lucide-react';
+import { Sparkles, Gift, Clock, LogOut, User, Menu, X, Coins, Share2, QrCode, Cake, ExternalLink } from 'lucide-react';
 import { CelestialEmblem } from './CelestialEmblem';
 
 export const Navbar: React.FC = () => {
@@ -25,24 +25,34 @@ export const Navbar: React.FC = () => {
   return (
     <header className="sticky top-0 z-50 bg-[#0F0F0F] border-b-2 border-[#282828] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Bauhaus Geometric Brand Logo - Redirects to homepage on click */}
-        <Link to="/" onClick={closeMenu} className="flex items-center space-x-2.5 group" title="bingooo.co.in">
+        {/* Bauhaus Geometric Brand Logo - Directly opens official bingooo.co.in website */}
+        <a
+          href="https://www.bingooo.co.in"
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={closeMenu}
+          className="flex items-center space-x-2.5 group cursor-pointer"
+          title="Visit official store: https://www.bingooo.co.in"
+        >
           <div className="w-8 h-8 bg-[#C91F32] border-2 border-white flex items-center justify-center font-black text-sm tracking-tighter text-white shadow-[2px_2px_0px_0px_#F5B700] group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-transform">
             B
           </div>
           <div className="flex flex-col text-left leading-none">
-            <span className="text-xl sm:text-2xl font-black tracking-widest text-white font-display uppercase group-hover:text-[#F5B700] transition-colors">
+            <span className="text-xl sm:text-2xl font-black tracking-widest text-white font-display uppercase group-hover:text-[#F5B700] transition-colors flex items-center">
               BINGO<span className="text-[#C91F32]">OO</span>
-              <span className="text-xs font-mono font-bold text-[#F5B700] lowercase tracking-normal">.co.in</span>
+              <span className="text-xs font-mono font-bold text-[#F5B700] lowercase tracking-normal ml-0.5 inline-flex items-center">
+                .co.in
+                <ExternalLink className="w-3 h-3 ml-0.5 opacity-80" />
+              </span>
             </span>
             <span className="text-[9px] text-gray-400 font-mono tracking-wider hidden sm:block">
-              SRIKAKULAM // MEN'S WEAR
+              SRIKAKULAM // MEN'S WEAR // STORE ↗
             </span>
           </div>
-        </Link>
+        </a>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center space-x-6 text-xs font-bold uppercase tracking-wider">
+        <nav className="hidden md:flex items-center space-x-5 text-xs font-bold uppercase tracking-wider">
           <Link
             to="/club"
             className={`transition flex items-center space-x-1.5 py-1 border-b-2 ${
@@ -97,6 +107,15 @@ export const Navbar: React.FC = () => {
           >
             Store Info
           </Link>
+          <a
+            href="https://www.bingooo.co.in"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#F5B700] hover:text-white transition py-1 px-2 bg-[#1C1C1C] border border-[#333333] hover:border-[#F5B700] flex items-center space-x-1 font-mono text-[11px]"
+            title="Open official bingooo.co.in website"
+          >
+            <span>STORE ↗</span>
+          </a>
         </nav>
 
         {/* Customer State, Celestial Icon & Action Button */}
@@ -246,6 +265,18 @@ export const Navbar: React.FC = () => {
               <Clock className="w-3.5 h-3.5 text-blue-400" />
               <span>Store Info</span>
             </Link>
+          </div>
+
+          <div className="pt-2">
+            <a
+              href="https://www.bingooo.co.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={closeMenu}
+              className="w-full flex items-center justify-center space-x-2 py-3 bg-[#C91F32] hover:bg-[#B01828] text-white text-xs font-mono font-black uppercase tracking-wider border-2 border-white shadow-[3px_3px_0px_0px_#F5B700] transition"
+            >
+              <span>🌐 VISIT BINGOOO.CO.IN STORE ↗</span>
+            </a>
           </div>
 
           <div className="pt-3 border-t border-[#262626] flex justify-between text-[11px] font-mono text-gray-400">

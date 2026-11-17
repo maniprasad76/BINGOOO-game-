@@ -9,25 +9,33 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Col */}
           <div className="space-y-4">
-            <Link to="/" className="flex items-center space-x-2 group inline-flex" title="Visit bingooo.co.in homepage">
+            <a
+              href="https://www.bingooo.co.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center space-x-2 group inline-flex"
+              title="Visit official bingooo.co.in store"
+            >
               <div className="w-7 h-7 bg-[#C91F32] border border-white flex items-center justify-center font-black text-xs text-white">
                 B
               </div>
               <span className="text-2xl font-black text-white font-display tracking-widest uppercase group-hover:text-[#F5B700] transition">
-                BINGO<span className="text-[#C91F32]">OO</span><span className="text-sm font-mono text-[#F5B700] lowercase">.co.in</span>
+                BINGO<span className="text-[#C91F32]">OO</span><span className="text-sm font-mono text-[#F5B700] lowercase">.co.in ↗</span>
               </span>
-            </Link>
+            </a>
             <p className="text-gray-400 text-xs leading-relaxed font-sans">
               Premier Men's Fashion House in Srikakulam. T-shirts, Shirts, Jeans & Trousers designed with modern geometric elegance.
             </p>
             <div>
-              <Link
-                to="/"
-                className="inline-flex items-center space-x-1.5 font-mono text-xs font-bold text-[#F5B700] hover:text-white transition px-2.5 py-1 bg-[#1A1A1A] border border-[#333333] shadow-[2px_2px_0px_0px_#C91F32]"
-                title="Go to bingooo.co.in homepage"
+              <a
+                href="https://www.bingooo.co.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center space-x-1.5 font-mono text-xs font-bold text-[#F5B700] hover:text-white transition px-3 py-1.5 bg-[#1A1A1A] border border-[#333333] hover:border-[#F5B700] shadow-[2px_2px_0px_0px_#C91F32]"
+                title="Go to official bingooo.co.in store"
               >
-                <span>🌐 BINGOOO.CO.IN →</span>
-              </Link>
+                <span>🌐 VISIT BINGOOO.CO.IN STORE ↗</span>
+              </a>
             </div>
           </div>
 
@@ -96,9 +104,15 @@ export const Footer: React.FC = () => {
         <div className="mt-12 pt-6 border-t border-[#222222] flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-gray-500">
           <p>
             © {new Date().getFullYear()}{' '}
-            <Link to="/" className="text-gray-300 hover:text-[#F5B700] font-bold underline decoration-[#C91F32]">
-              BINGOOO.CO.IN
-            </Link>{' '}
+            <a
+              href="https://www.bingooo.co.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-300 hover:text-[#F5B700] font-bold underline decoration-[#C91F32]"
+              title="Official store website"
+            >
+              BINGOOO.CO.IN ↗
+            </a>{' '}
             // ALL RIGHTS RESERVED.
           </p>
           <p className="mt-2 sm:mt-0 flex items-center space-x-1 text-gray-400">

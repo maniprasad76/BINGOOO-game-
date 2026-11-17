@@ -13,14 +13,16 @@ export const Footer: React.FC = () => {
               href="https://www.bingooo.co.in"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center space-x-2 group inline-flex"
+              className="flex items-center space-x-2.5 group inline-flex"
               title="Visit official bingooo.co.in store"
             >
-              <div className="w-7 h-7 bg-[#C91F32] border border-white flex items-center justify-center font-black text-xs text-white">
+              <div className="w-8 h-8 bg-[#C91F32] border-2 border-white flex items-center justify-center font-black text-sm text-white shadow-[2px_2px_0px_0px_#F5B700] shrink-0">
                 B
               </div>
-              <span className="text-2xl font-black text-white font-display tracking-widest uppercase group-hover:text-[#F5B700] transition">
-                BINGO<span className="text-[#C91F32]">OO</span><span className="text-sm font-mono text-[#F5B700] lowercase">.co.in ↗</span>
+              <span className="text-2xl font-black font-display tracking-wider uppercase transition-colors whitespace-nowrap leading-none">
+                <span className="text-white group-hover:text-[#F5B700] transition-colors">BINGO</span>
+                <span className="text-[#C91F32]">OO</span>
+                <span className="text-[#F5B700]">.CO.IN</span>
               </span>
             </a>
             <p className="text-gray-400 text-xs leading-relaxed font-sans">

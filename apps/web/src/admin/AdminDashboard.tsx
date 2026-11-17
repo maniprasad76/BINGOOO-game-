@@ -145,10 +145,12 @@ export const AdminDashboard: React.FC = () => {
                 href="https://www.bingooo.co.in"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xl font-black text-white font-display tracking-wider hover:text-[#F5B700] transition group flex items-center space-x-1"
+                className="text-xl font-black font-display tracking-wider hover:text-[#F5B700] transition group flex items-center uppercase whitespace-nowrap leading-none"
                 title="Return to official bingooo.co.in store"
               >
-                <span>BINGO<span className="text-[#C91F32]">OO</span><span className="text-xs text-[#F5B700] font-mono lowercase">.co.in ↗</span></span>
+                <span className="text-white group-hover:text-[#F5B700] transition-colors">BINGO</span>
+                <span className="text-[#C91F32]">OO</span>
+                <span className="text-[#F5B700]">.CO.IN</span>
               </a>
               <span className="px-2 py-0.5 bg-[#F5B700] text-black border border-black text-[10px] font-mono font-black uppercase tracking-wider">
                 GIFT WINNERS DESK

@@ -34,19 +34,17 @@ export const Navbar: React.FC = () => {
           className="flex items-center space-x-2.5 group cursor-pointer"
           title="Visit official store: https://www.bingooo.co.in"
         >
-          <div className="w-8 h-8 bg-[#C91F32] border-2 border-white flex items-center justify-center font-black text-sm tracking-tighter text-white shadow-[2px_2px_0px_0px_#F5B700] group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-transform">
+          <div className="w-8 h-8 bg-[#C91F32] border-2 border-white flex items-center justify-center font-black text-sm tracking-tighter text-white shadow-[2px_2px_0px_0px_#F5B700] group-hover:translate-x-0.5 group-hover:translate-y-0.5 transition-transform shrink-0">
             B
           </div>
           <div className="flex flex-col text-left leading-none">
-            <span className="text-xl sm:text-2xl font-black tracking-widest text-white font-display uppercase group-hover:text-[#F5B700] transition-colors flex items-center">
-              BINGO<span className="text-[#C91F32]">OO</span>
-              <span className="text-xs font-mono font-bold text-[#F5B700] lowercase tracking-normal ml-0.5 inline-flex items-center">
-                .co.in
-                <ExternalLink className="w-3 h-3 ml-0.5 opacity-80" />
-              </span>
+            <span className="text-xl sm:text-2xl font-black tracking-wider font-display uppercase transition-colors flex items-center whitespace-nowrap leading-none">
+              <span className="text-white group-hover:text-[#F5B700] transition-colors">BINGO</span>
+              <span className="text-[#C91F32]">OO</span>
+              <span className="text-[#F5B700]">.CO.IN</span>
             </span>
-            <span className="text-[9px] text-gray-400 font-mono tracking-wider hidden sm:block">
-              SRIKAKULAM // MEN'S WEAR // STORE ↗
+            <span className="text-[9px] text-gray-400 font-mono tracking-wider hidden sm:block mt-1 whitespace-nowrap">
+              SRIKAKULAM // MEN'S WEAR
             </span>
           </div>
         </a>

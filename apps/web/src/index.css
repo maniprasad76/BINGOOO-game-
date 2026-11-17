@@ -7,6 +7,7 @@
     background-color: #0F0F0F;
     color: #FFFFFF;
     font-family: 'Outfit', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -47,6 +48,102 @@
   box-shadow: 6px 6px 0px 0px #16428C;
 }
 
+/* ========================================================= */
+/* CELESTIAL SUN & MOON THEME RULES                          */
+/* ========================================================= */
+
+/* SUN / DAYLIGHT THEME */
+html[data-theme="sun"] body,
+html.theme-sun body {
+  background-color: #F7F5F0;
+  color: #121212;
+}
+
+html[data-theme="sun"] .bauhaus-grid-bg,
+html.theme-sun .bauhaus-grid-bg {
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+}
+
+html[data-theme="sun"] header,
+html.theme-sun header {
+  background-color: #FFFFFF !important;
+  border-color: #111111 !important;
+  color: #111111 !important;
+}
+
+html[data-theme="sun"] footer,
+html.theme-sun footer {
+  background-color: #EBE8DE !important;
+  border-color: #111111 !important;
+  color: #111111 !important;
+}
+
+html[data-theme="sun"] footer h4,
+html.theme-sun footer h4 {
+  color: #111111 !important;
+}
+
+html[data-theme="sun"] .bg-\[\#0F0F0F\],
+html[data-theme="sun"] .bg-\[\#0D0D0D\],
+html[data-theme="sun"] .bg-\[\#0A0A0A\],
+html.theme-sun .bg-\[\#0F0F0F\],
+html.theme-sun .bg-\[\#0D0D0D\],
+html.theme-sun .bg-\[\#0A0A0A\] {
+  background-color: #F7F5F0 !important;
+}
+
+html[data-theme="sun"] .bg-\[\#141414\],
+html[data-theme="sun"] .bg-\[\#151515\],
+html[data-theme="sun"] .bg-\[\#161616\],
+html[data-theme="sun"] .bg-\[\#181818\],
+html[data-theme="sun"] .bg-\[\#191919\],
+html.theme-sun .bg-\[\#141414\],
+html.theme-sun .bg-\[\#151515\],
+html.theme-sun .bg-\[\#161616\],
+html.theme-sun .bg-\[\#181818\],
+html.theme-sun .bg-\[\#191919\] {
+  background-color: #FFFFFF !important;
+  color: #111111 !important;
+}
+
+html[data-theme="sun"] .text-white:not(button *):not(button):not(.bg-\[\#C91F32\] *):not(.bg-\[\#C91F32\]):not(.bg-\[\#0047AB\] *):not(.bg-\[\#0047AB\]):not(.bg-\[\#B01828\] *):not(.bg-\[\#B01828\]),
+html.theme-sun .text-white:not(button *):not(button):not(.bg-\[\#C91F32\] *):not(.bg-\[\#C91F32\]):not(.bg-\[\#0047AB\] *):not(.bg-\[\#0047AB\]):not(.bg-\[\#B01828\] *):not(.bg-\[\#B01828\]) {
+  color: #111111;
+}
+
+html[data-theme="sun"] .text-gray-400,
+html[data-theme="sun"] .text-gray-300,
+html.theme-sun .text-gray-400,
+html.theme-sun .text-gray-300 {
+  color: #4B5563;
+}
+
+html[data-theme="sun"] .border-white,
+html[data-theme="sun"] .border-\[\#282828\],
+html[data-theme="sun"] .border-\[\#333333\],
+html[data-theme="sun"] .border-\[\#2A2A2A\],
+html.theme-sun .border-white,
+html.theme-sun .border-\[\#282828\],
+html.theme-sun .border-\[\#333333\],
+html.theme-sun .border-\[\#2A2A2A\] {
+  border-color: #111111 !important;
+}
+
+html[data-theme="sun"] .shadow-\[8px_8px_0px_0px_\#FFFFFF\],
+html[data-theme="sun"] .shadow-\[6px_6px_0px_0px_\#FFFFFF\],
+html[data-theme="sun"] .shadow-\[4px_4px_0px_0px_\#FFFFFF\],
+html[data-theme="sun"] .shadow-\[3px_3px_0px_0px_\#FFFFFF\],
+html[data-theme="sun"] .shadow-\[2px_2px_0px_0px_\#FFFFFF\],
+html.theme-sun .shadow-\[8px_8px_0px_0px_\#FFFFFF\],
+html.theme-sun .shadow-\[6px_6px_0px_0px_\#FFFFFF\],
+html.theme-sun .shadow-\[4px_4px_0px_0px_\#FFFFFF\],
+html.theme-sun .shadow-\[3px_3px_0px_0px_\#FFFFFF\],
+html.theme-sun .shadow-\[2px_2px_0px_0px_\#FFFFFF\] {
+  box-shadow: 4px 4px 0px 0px #111111 !important;
+}
+
 /* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
@@ -60,4 +157,11 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #C91F32;
+}
+
+html[data-theme="sun"] ::-webkit-scrollbar-track {
+  background: #F7F5F0;
+}
+html[data-theme="sun"] ::-webkit-scrollbar-thumb {
+  background: #CCCCCC;
 }

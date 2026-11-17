@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { ApiClient } from '../services/api.service';
 import { PrintableStandeeModal } from '../components/admin/PrintableStandeeModal';
+import { CelestialEmblem } from '../components/layout/CelestialEmblem';
 
 export const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -153,13 +154,16 @@ export const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <CelestialEmblem />
+
           <button
             onClick={() => setStandeeModalOpen(true)}
             className="flex items-center space-x-2 px-3.5 py-2 bg-[#F5B700] hover:bg-[#DBA300] text-black font-mono font-bold text-xs uppercase tracking-wider transition-all border-2 border-white shadow-[3px_3px_0px_0px_#FFFFFF] hover:translate-x-0.5 hover:translate-y-0.5"
           >
             <Printer className="w-4 h-4" />
-            <span>PRINT COUNTER STANDEE</span>
+            <span className="hidden sm:inline">PRINT COUNTER STANDEE</span>
+            <span className="sm:hidden">STANDEE</span>
           </button>
 
           <span className="text-xs font-mono text-gray-300 hidden md:inline">

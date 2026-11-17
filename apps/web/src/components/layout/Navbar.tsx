@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Sparkles, Gift, Clock, LogOut, User, Menu, X, Coins, Share2, QrCode, Cake } from 'lucide-react';
+import { CelestialEmblem } from './CelestialEmblem';
 
 export const Navbar: React.FC = () => {
   const navigate = useNavigate();
@@ -95,8 +96,18 @@ export const Navbar: React.FC = () => {
           </Link>
         </nav>
 
-        {/* Customer State or Action Button */}
-        <div className="flex items-center space-x-3">
+        {/* Customer State, Celestial Emblem & Action Button */}
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          {/* Celestial Sun & Moon Astrolabe Emblem (Not a toggle button) */}
+          <div className="hidden sm:inline-block">
+            <CelestialEmblem />
+          </div>
+
+          {/* Compact Celestial on Mobile */}
+          <div className="sm:hidden inline-block">
+            <CelestialEmblem compact />
+          </div>
+
           {userEmail ? (
             <div className="flex items-center space-x-2">
               <span className="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 bg-[#181818] border border-[#333333] text-xs font-mono text-gray-300">
@@ -123,7 +134,7 @@ export const Navbar: React.FC = () => {
           <Link
             to="/spin"
             onClick={closeMenu}
-            className="px-4 py-2 bg-[#C91F32] hover:bg-[#B01828] text-white text-xs font-black tracking-widest uppercase transition-all border-2 border-white shadow-[3px_3px_0px_0px_#F5B700] hover:translate-x-0.5 hover:translate-y-0.5 flex items-center space-x-1.5"
+            className="px-3 sm:px-4 py-2 bg-[#C91F32] hover:bg-[#B01828] text-white text-xs font-black tracking-widest uppercase transition-all border-2 border-white shadow-[3px_3px_0px_0px_#F5B700] hover:translate-x-0.5 hover:translate-y-0.5 flex items-center space-x-1.5 shrink-0"
           >
             <Sparkles className="w-3.5 h-3.5 text-[#F5B700]" />
             <span>SPIN NOW</span>
@@ -132,7 +143,7 @@ export const Navbar: React.FC = () => {
           {/* Mobile Hamburger Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-gray-300 hover:text-white hover:bg-[#1f1f1f] border-2 border-[#333] transition"
+            className="md:hidden p-2 text-gray-300 hover:text-white hover:bg-[#1f1f1f] border-2 border-[#333] transition shrink-0"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}

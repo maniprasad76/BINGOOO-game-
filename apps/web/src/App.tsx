@@ -18,6 +18,7 @@ import { ContactPage } from './pages/ContactPage';
 import { TermsPage, PrivacyPage } from './pages/LegalPages';
 import { AdminLoginPage } from './admin/AdminLoginPage';
 import { AdminDashboard } from './admin/AdminDashboard';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Protected Admin Route Guard
 const ProtectedAdminRoute = ({ children }: { children: React.ReactNode }) => {
@@ -32,51 +33,53 @@ export const App: React.FC = () => {
   usePageMeta();
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#111111] text-white">
-      <Routes>
-        {/* Admin Routes without Public Navbar/Footer */}
-        <Route path="/admin/login" element={<AdminLoginPage />} />
-        <Route
-          path="/admin/*"
-          element={
-            <ProtectedAdminRoute>
-              <AdminDashboard />
-            </ProtectedAdminRoute>
-          }
-        />
+    <ThemeProvider>
+      <div className="flex flex-col min-h-screen transition-colors duration-300">
+        <Routes>
+          {/* Admin Routes without Public Navbar/Footer */}
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route
+            path="/admin/*"
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboard />
+              </ProtectedAdminRoute>
+            }
+          />
 
-        {/* Public Routes with Branded Navbar and Footer */}
-        <Route
-          path="*"
-          element={
-            <>
-              <Navbar />
-              <main className="flex-grow">
-                <Routes>
-                  <Route path="/" element={<RewardsClubHubPage />} />
-                  <Route path="/club" element={<RewardsClubHubPage />} />
-                  <Route path="/club/wallet" element={<CoinsWalletPage />} />
-                  <Route path="/club/refer" element={<ReferralsPage />} />
-                  <Route path="/club/check-in" element={<StoreCheckInPage />} />
-                  <Route path="/club/birthday" element={<BirthdayRewardsPage />} />
-                  <Route path="/spin" element={<SpinPage />} />
-                  <Route path="/login" element={<CustomerLoginPage />} />
-                  <Route path="/verify" element={<CustomerLoginPage />} />
-                  <Route path="/rewards" element={<RewardsPage />} />
-                  <Route path="/reward/:code" element={<RewardDetailPage />} />
-                  <Route path="/how-it-works" element={<HowItWorksPage />} />
-                  <Route path="/contact" element={<ContactPage />} />
-                  <Route path="/terms" element={<TermsPage />} />
-                  <Route path="/privacy" element={<PrivacyPage />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </main>
-              <Footer />
-            </>
-          }
-        />
-      </Routes>
-    </div>
+          {/* Public Routes with Branded Navbar and Footer */}
+          <Route
+            path="*"
+            element={
+              <>
+                <Navbar />
+                <main className="flex-grow">
+                  <Routes>
+                    <Route path="/" element={<RewardsClubHubPage />} />
+                    <Route path="/club" element={<RewardsClubHubPage />} />
+                    <Route path="/club/wallet" element={<CoinsWalletPage />} />
+                    <Route path="/club/refer" element={<ReferralsPage />} />
+                    <Route path="/club/check-in" element={<StoreCheckInPage />} />
+                    <Route path="/club/birthday" element={<BirthdayRewardsPage />} />
+                    <Route path="/spin" element={<SpinPage />} />
+                    <Route path="/login" element={<CustomerLoginPage />} />
+                    <Route path="/verify" element={<CustomerLoginPage />} />
+                    <Route path="/rewards" element={<RewardsPage />} />
+                    <Route path="/reward/:code" element={<RewardDetailPage />} />
+                    <Route path="/how-it-works" element={<HowItWorksPage />} />
+                    <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/terms" element={<TermsPage />} />
+                    <Route path="/privacy" element={<PrivacyPage />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </main>
+                <Footer />
+              </>
+            }
+          />
+        </Routes>
+      </div>
+    </ThemeProvider>
   );
 };
 

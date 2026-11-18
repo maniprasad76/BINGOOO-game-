@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { Sparkles, AlertCircle, Volume2, VolumeX } from 'lucide-react';
+import { Sparkles, AlertCircle, Volume2, VolumeX, Instagram } from 'lucide-react';
 
 // Web Audio API Sound Synthesizer (0 external dependencies, works offline)
 class WheelSoundFX {
@@ -73,12 +73,16 @@ interface SpinWheelProps {
   segments: Segment[];
   onSpinRequest: () => Promise<{ segmentIndex: number; isWin: boolean; prizeName: string }>;
   disabled?: boolean;
+  onBeforeSpinClick?: () => boolean;
+  isInstagramFollowed?: boolean;
 }
 
 export const SpinWheel: React.FC<SpinWheelProps> = ({
   segments,
   onSpinRequest,
-  disabled = false
+  disabled = false,
+  onBeforeSpinClick,
+  isInstagramFollowed = true
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
@@ -202,6 +206,11 @@ export const SpinWheel: React.FC<SpinWheelProps> = ({
   const handleSpinClick = async () => {
     if (isSpinning || disabled) return;
 
+    // Check pre-spin requirements (e.g. Instagram Follow Gate)
+    if (onBeforeSpinClick && !onBeforeSpinClick()) {
+      return;
+    }
+
     try {
       setIsSpinning(true);
 
@@ -284,24 +293,32 @@ export const SpinWheel: React.FC<SpinWheelProps> = ({
           onClick={handleSpinClick}
         />
 
-        {/* Central Bauhaus SPIN Push-Button */}
+        {/* Central Apple-Grade SPIN Push-Button */}
         <button
           onClick={handleSpinClick}
           disabled={isSpinning || disabled}
-          className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full font-display font-black text-sm tracking-widest uppercase transition-all flex flex-col items-center justify-center border-3 border-white z-10 ${
+          className={`absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full font-bold text-xs tracking-wider uppercase transition-all flex flex-col items-center justify-center z-10 shadow-2xl ${
             disabled
-              ? 'bg-[#222222] text-gray-500 border-gray-600 cursor-not-allowed'
+              ? 'bg-neutral-900 text-neutral-500 border border-neutral-800 cursor-not-allowed'
               : isSpinning
-              ? 'bg-[#C91F32] text-white border-white animate-pulse'
-              : 'bg-[#C91F32] hover:bg-[#B01828] text-white hover:scale-105 active:scale-95 shadow-[4px_4px_0px_0px_#FFFFFF]'
+              ? 'bg-[#0071E3] text-white border-2 border-white/40 animate-pulse'
+              : !isInstagramFollowed
+              ? 'bg-gradient-to-tr from-[#FD5949] via-[#D6249F] to-[#285AEB] text-white hover:scale-105 active:scale-95 border-2 border-white/60 shadow-[0_0_20px_rgba(214,36,159,0.4)]'
+              : 'bg-[#0071E3] hover:bg-[#0077ED] text-white hover:scale-105 active:scale-95 border-2 border-white/40 shadow-[0_0_25px_rgba(0,113,227,0.5)]'
           }`}
         >
           {isSpinning ? (
-            <span className="text-[11px] font-mono">SPINNING</span>
+            <span className="text-[10px] font-mono tracking-tight">SPINNING</span>
+          ) : !isInstagramFollowed ? (
+            <>
+              <Instagram className="w-4 h-4 text-white mb-0.5" />
+              <span className="text-[10px] font-black">FOLLOW</span>
+              <span className="text-[8px] opacity-90 -mt-0.5">TO SPIN</span>
+            </>
           ) : (
             <>
-              <Sparkles className="w-4 h-4 text-[#F5B700] mb-0.5" />
-              <span className="font-extrabold">SPIN</span>
+              <Sparkles className="w-4 h-4 text-white mb-0.5" />
+              <span className="font-extrabold text-sm">SPIN</span>
             </>
           )}
         </button>

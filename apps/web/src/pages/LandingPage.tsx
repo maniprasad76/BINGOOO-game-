@@ -4,241 +4,202 @@ import {
   Sparkles,
   ShoppingBag,
   Award,
-  CheckCircle2,
   Calendar,
   MapPin,
   ArrowRight,
   ShieldCheck,
   Gift,
-  ExternalLink
+  ArrowUpRight
 } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
   return (
-    <div className="space-y-16 sm:space-y-24 pb-16">
-      {/* Top Announcement Bar */}
-      <div className="bg-gradient-to-r from-[#C91F32] via-[#851320] to-[#C91F32] py-2 px-4 text-center text-xs sm:text-sm font-semibold tracking-wider text-white shadow-md flex items-center justify-center space-x-2">
-        <Sparkles className="w-4 h-4 text-[#D4AF37]" />
-        <span>NOVEMBER FESTIVE SPIN & WIN LIVE — VISIT SRIKAKULAM STORE!</span>
-      </div>
-
+    <div className="space-y-20 sm:space-y-28 pb-20">
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8 text-center">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#1C1C1C] border border-[#2A2A2A] text-xs font-semibold text-[#D4AF37] mb-6">
-          <Award className="w-4 h-4" />
-          <span>Exclusive Srikakulam Men's Store Promotion</span>
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 text-center space-y-6">
+        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/[0.06] border border-white/[0.08] text-xs font-medium text-[#86868B]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#0071E3] animate-pulse" />
+          <span>Srikakulam Store Rewards Program</span>
         </div>
 
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-white font-display mb-6 uppercase">
-          SPIN. WIN. <span className="text-[#C91F32]">SHOP.</span>
+        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08]">
+          Spin. Win. <br />
+          <span className="bg-gradient-to-r from-[#0071E3] via-[#409CFF] to-[#98C7FF] bg-clip-text text-transparent">
+            Wear the best.
+          </span>
         </h1>
 
-        <p className="max-w-2xl mx-auto text-base sm:text-xl text-gray-300 font-normal leading-relaxed mb-8">
-          Your monthly chance to unlock exclusive <strong className="text-white">BINGOOO</strong> discounts, vouchers, and free gifts for your next in-store shopping spree.
+        <p className="max-w-xl mx-auto text-base sm:text-lg text-[#86868B] font-normal leading-relaxed">
+          Unlock monthly shopping discounts, cash vouchers, and free gifts redeemable in person at BINGOOO Men's Wear, Srikakulam.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link
             to="/spin"
-            className="w-full sm:w-auto px-8 py-4 rounded-xl bg-[#C91F32] hover:bg-[#A81525] text-white font-bold text-base tracking-wider uppercase transition shadow-xl shadow-[#C91F32]/30 flex items-center justify-center space-x-2"
+            className="apple-button-primary w-full sm:w-auto inline-flex items-center justify-center space-x-2 text-sm"
           >
-            <Sparkles className="w-5 h-5 text-[#D4AF37]" />
-            <span>SPIN NOW</span>
+            <Sparkles className="w-4 h-4" />
+            <span>Spin the Wheel</span>
           </Link>
-          <a
-            href="https://www.bingooo.co.in"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full sm:w-auto px-6 py-4 rounded-xl bg-[#1A1A1A] hover:bg-[#252525] border border-[#F5B700]/50 text-[#F5B700] hover:text-white font-bold text-base transition flex items-center justify-center space-x-2 shadow-lg"
-            title="Visit official clothing store website"
-          >
-            <ShoppingBag className="w-4 h-4 text-[#F5B700]" />
-            <span>VISIT BINGOOO.CO.IN STORE ↗</span>
-          </a>
           <Link
-            to="/how-it-works"
-            className="w-full sm:w-auto px-6 py-4 rounded-xl bg-[#1A1A1A] hover:bg-[#252525] border border-[#2A2A2A] text-gray-200 font-semibold text-base transition flex items-center justify-center space-x-2"
+            to="/club"
+            className="apple-button-secondary w-full sm:w-auto inline-flex items-center justify-center space-x-2 text-sm"
           >
-            <span>How It Works</span>
-            <ArrowRight className="w-4 h-4 text-gray-400" />
+            <span>Rewards Club</span>
+            <ArrowRight className="w-3.5 h-3.5 text-[#86868B]" />
           </Link>
         </div>
 
-        {/* Brand Garment Tagline */}
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-gray-400 font-medium">
-          <span className="flex items-center space-x-1.5"><ShoppingBag className="w-4 h-4 text-[#C91F32]" /><span>Premium T-Shirts</span></span>
-          <span className="text-gray-700">•</span>
-          <span className="flex items-center space-x-1.5"><ShoppingBag className="w-4 h-4 text-[#D4AF37]" /><span>Stylist Shirts</span></span>
-          <span className="text-gray-700">•</span>
-          <span className="flex items-center space-x-1.5"><ShoppingBag className="w-4 h-4 text-[#C91F32]" /><span>Slim & Baggy Jeans</span></span>
-          <span className="text-gray-700">•</span>
-          <span className="flex items-center space-x-1.5"><ShoppingBag className="w-4 h-4 text-[#D4AF37]" /><span>Formal & Casual Trousers</span></span>
+        {/* Garment Highlights */}
+        <div className="pt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs text-[#86868B]">
+          <span className="flex items-center space-x-1.5">
+            <span className="w-1 h-1 rounded-full bg-[#86868B]" />
+            <span>Premium Tees</span>
+          </span>
+          <span className="flex items-center space-x-1.5">
+            <span className="w-1 h-1 rounded-full bg-[#86868B]" />
+            <span>Linen Shirts</span>
+          </span>
+          <span className="flex items-center space-x-1.5">
+            <span className="w-1 h-1 rounded-full bg-[#86868B]" />
+            <span>Baggy & Raw Denim</span>
+          </span>
+          <span className="flex items-center space-x-1.5">
+            <span className="w-1 h-1 rounded-full bg-[#86868B]" />
+            <span>Korean Chinos</span>
+          </span>
         </div>
       </section>
 
-      {/* Four Reward Cards */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold font-display uppercase tracking-wide">
-            Monthly Spin Rewards
+      {/* Monthly Rewards Grid */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="text-center max-w-xl mx-auto mb-10 space-y-2">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            Monthly Prizes
           </h2>
-          <p className="text-sm text-gray-400 mt-2">
-            Every verified customer gets 1 free spin every calendar month at midnight IST.
+          <p className="text-xs sm:text-sm text-[#86868B]">
+            Every verified phone number receives 1 free spin chance each calendar month.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {/* TRY AGAIN (Free Re-Spin) */}
-          <div className="p-5 rounded-2xl bg-[#161616] border-2 border-[#F5B700] hover:border-white transition space-y-3 relative overflow-hidden group shadow-xl shadow-[#F5B700]/10">
-            <div className="w-10 h-10 rounded-xl bg-[#F5B700]/20 border border-[#F5B700]/30 flex items-center justify-center text-[#F5B700]">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-white font-display">Try Again! (Re-Spin)</h3>
-            <p className="text-[11px] text-gray-300 leading-relaxed">
-              Land on Try Again and unlock an instant free re-spin! Keep the excitement spinning.
-            </p>
-            <span className="inline-block text-[10px] font-bold text-[#F5B700] uppercase tracking-wider bg-[#F5B700]/10 px-2 py-0.5 rounded border border-[#F5B700]/30">
-              Instant Free Spin
-            </span>
-          </div>
-
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* 20% OFF */}
-          <div className="p-5 rounded-2xl bg-[#161616] border border-[#2A2A2A] hover:border-[#D4AF37]/50 transition space-y-3 relative overflow-hidden group">
-            <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/20 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] font-black text-sm">
-              20%
-            </div>
-            <h3 className="text-base font-bold text-white font-display">20% Mega Discount</h3>
-            <p className="text-[11px] text-gray-400 leading-relaxed">
-              Unlock a mega 20% discount on luxury suits, party shirts, and seasonal trousers.
+          <div className="apple-glass-card rounded-2xl p-6 space-y-3">
+            <span className="text-2xl font-bold text-white tracking-tight">20% OFF</span>
+            <h3 className="text-sm font-semibold text-white">Mega Discount</h3>
+            <p className="text-xs text-[#86868B] leading-relaxed">
+              Save 20% on party wear, blazers, and luxury shirts across the store.
             </p>
-            <span className="inline-block text-[10px] font-semibold text-[#D4AF37] uppercase tracking-wider">
-              Mega Savings
-            </span>
           </div>
 
           {/* 10% OFF */}
-          <div className="p-5 rounded-2xl bg-[#161616] border border-[#2A2A2A] hover:border-[#C91F32]/50 transition space-y-3 relative overflow-hidden group">
-            <div className="w-10 h-10 rounded-xl bg-[#C91F32]/20 border border-[#C91F32]/30 flex items-center justify-center text-[#C91F32] font-black text-sm">
-              10%
-            </div>
-            <h3 className="text-base font-bold text-white font-display">10% OFF Entire Bill</h3>
-            <p className="text-[11px] text-gray-400 leading-relaxed">
-              Flat 10% savings on any combination of shirts, jeans, and polo t-shirts.
+          <div className="apple-glass-card rounded-2xl p-6 space-y-3">
+            <span className="text-2xl font-bold text-white tracking-tight">10% OFF</span>
+            <h3 className="text-sm font-semibold text-white">Storewide Discount</h3>
+            <p className="text-xs text-[#86868B] leading-relaxed">
+              Flat 10% savings on any combination of shirts, jeans, and polos.
             </p>
-            <span className="inline-block text-[10px] font-semibold text-[#D4AF37] uppercase tracking-wider">
-              Storewide Discount
-            </span>
           </div>
 
           {/* 5% OFF */}
-          <div className="p-5 rounded-2xl bg-[#161616] border border-[#2A2A2A] hover:border-[#D4AF37]/50 transition space-y-3 relative overflow-hidden group">
-            <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/20 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37] font-black text-sm">
-              5%
-            </div>
-            <h3 className="text-base font-bold text-white font-display">5% Instant Discount</h3>
-            <p className="text-[11px] text-gray-400 leading-relaxed">
-              Instant savings on Korean trousers and summer t-shirts on checkout.
+          <div className="apple-glass-card rounded-2xl p-6 space-y-3">
+            <span className="text-2xl font-bold text-white tracking-tight">5% OFF</span>
+            <h3 className="text-sm font-semibold text-white">Instant Savings</h3>
+            <p className="text-xs text-[#86868B] leading-relaxed">
+              Instant discount on everyday tees, Korean trousers, and caps.
             </p>
-            <span className="inline-block text-[10px] font-semibold text-[#D4AF37] uppercase tracking-wider">
-              Instant In-Store Pass
-            </span>
           </div>
 
-          {/* FREE GIFT */}
-          <div className="p-5 rounded-2xl bg-[#161616] border border-[#2A2A2A] hover:border-[#C91F32]/50 transition space-y-3 relative overflow-hidden group">
-            <div className="w-10 h-10 rounded-xl bg-[#C91F32]/20 border border-[#C91F32]/30 flex items-center justify-center text-[#C91F32]">
-              <Gift className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-white font-display">FREE Accessory</h3>
-            <p className="text-[11px] text-gray-400 leading-relaxed">
-              Win an exclusive BINGOOO branded fashion accessory or keychain given free on visit.
+          {/* Surprise Gift */}
+          <div className="apple-glass-card rounded-2xl p-6 space-y-3">
+            <span className="text-2xl font-bold text-white tracking-tight">Surprise Gift</span>
+            <h3 className="text-sm font-semibold text-white">Complimentary Gift</h3>
+            <p className="text-xs text-[#86868B] leading-relaxed">
+              Receive a bespoke BINGOOO branded fashion accessory on checkout.
             </p>
-            <span className="inline-block text-[10px] font-semibold text-[#D4AF37] uppercase tracking-wider">
-              Limited Gift Stock
-            </span>
           </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-[#141414] rounded-3xl border border-[#222222] p-8 sm:p-12">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold font-display uppercase tracking-wide">
-              How To Play & Claim Rewards
+      {/* How It Works - 3 Minimal Steps */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="apple-glass-card rounded-3xl p-8 sm:p-12 space-y-8">
+          <div className="text-center max-w-lg mx-auto space-y-2">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+              Three Simple Steps
             </h2>
-            <p className="text-sm text-gray-400 mt-2">
-              Three effortless steps to claim your discount at our physical store in Srikakulam.
+            <p className="text-xs text-[#86868B]">
+              How to participate and redeem your voucher at our flagship store.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-            <div className="space-y-3">
-              <div className="w-10 h-10 rounded-full bg-[#C91F32] text-white font-bold flex items-center justify-center mx-auto md:mx-0 shadow-md">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <span className="w-7 h-7 rounded-full bg-white/[0.08] text-white text-xs font-semibold flex items-center justify-center">
                 1
-              </div>
-              <h4 className="text-lg font-bold text-white">Visit & Spin The Wheel</h4>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                No phone number or OTP verification needed! Simply open the wheel and tap spin to participate.
+              </span>
+              <h4 className="text-sm font-semibold text-white">Open & Spin</h4>
+              <p className="text-xs text-[#86868B] leading-relaxed">
+                Open the spin wheel and tap once. The server generates your monthly reward.
               </p>
             </div>
 
-            <div className="space-y-3">
-              <div className="w-10 h-10 rounded-full bg-[#D4AF37] text-[#111111] font-bold flex items-center justify-center mx-auto md:mx-0 shadow-md">
+            <div className="space-y-2">
+              <span className="w-7 h-7 rounded-full bg-white/[0.08] text-white text-xs font-semibold flex items-center justify-center">
                 2
-              </div>
-              <h4 className="text-lg font-bold text-white">Spin The Wheel</h4>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                Hit the central spin button! The server securely commits your prize and delivers your unique reward code.
+              </span>
+              <h4 className="text-sm font-semibold text-white">Get Digital Pass</h4>
+              <p className="text-xs text-[#86868B] leading-relaxed">
+                Receive your unique voucher code (e.g. BGO-XXXX-XXXX) saved to your device.
               </p>
             </div>
 
-            <div className="space-y-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center mx-auto md:mx-0 shadow-md">
+            <div className="space-y-2">
+              <span className="w-7 h-7 rounded-full bg-white/[0.08] text-white text-xs font-semibold flex items-center justify-center">
                 3
-              </div>
-              <h4 className="text-lg font-bold text-white">Redeem At Store Checkout</h4>
-              <p className="text-xs text-gray-400 leading-relaxed">
-                Show your unique voucher code (e.g. BGO-XXXX-XXXX) to the cashier at our Srikakulam store to apply your discount.
+              </span>
+              <h4 className="text-sm font-semibold text-white">Redeem In Store</h4>
+              <p className="text-xs text-[#86868B] leading-relaxed">
+                Show your code to the billing counter at BINGOOO Men's Wear in Srikakulam.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Store Location & Hours */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="p-8 bg-[#141414] border-3 border-white shadow-[6px_6px_0px_0px_#C91F32] flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 text-center md:text-left">
-            <div className="inline-flex items-center space-x-2 px-2.5 py-0.5 bg-[#F5B700] text-black font-mono font-bold text-[10px] uppercase tracking-wider border border-black">
-              <span>EXACT STORE LOCATION</span>
-            </div>
-            <h3 className="text-xl sm:text-2xl font-black font-display uppercase tracking-wide text-white">
-              Visit BINGO<span className="text-[#C91F32]">OO</span> In Srikakulam
+      {/* Store Location Card */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="apple-glass-card rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2">
+            <span className="text-[11px] text-[#0071E3] font-medium uppercase tracking-wider block">
+              Flagship Boutique
+            </span>
+            <h3 className="text-xl font-bold tracking-tight text-white">
+              BINGOOO Men's Wear, Srikakulam
             </h3>
-            <p className="text-sm text-gray-300 flex items-center justify-center md:justify-start space-x-2">
-              <MapPin className="w-4 h-4 text-[#C91F32]" />
-              <span className="font-sans">NH16, Kushalpuram, Srikakulam District, Andhra Pradesh — 532410</span>
+            <p className="text-xs text-[#86868B] flex items-center space-x-1.5">
+              <MapPin className="w-3.5 h-3.5 text-[#0071E3] shrink-0" />
+              <span>NH16 (Main Road), Kushalpuram, Srikakulam, AP — 532410</span>
             </p>
-            <p className="text-xs text-gray-400 font-mono">
-              Open 7 days a week: 10:00 AM to 9:30 PM IST // GPS: 18.296273, 83.869070
+            <p className="text-[11px] text-[#86868B]">
+              Open daily: 10:00 AM – 9:30 PM IST
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+          <div className="flex items-center space-x-3 shrink-0 w-full sm:w-auto">
             <a
               href="https://maps.app.goo.gl/hV1XT66gjiD9zG4dA"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-6 py-3 bg-[#C91F32] hover:bg-[#B01828] text-white font-mono font-black text-xs uppercase tracking-widest transition-all border-2 border-white shadow-[3px_3px_0px_0px_#F5B700] hover:translate-x-0.5 hover:translate-y-0.5 flex items-center space-x-2"
+              className="apple-button-primary w-full sm:w-auto text-center text-xs"
             >
-              <span>OPEN GOOGLE MAPS ↗</span>
+              Open in Maps ↗
             </a>
             <Link
               to="/contact"
-              className="px-5 py-3 bg-[#222222] hover:bg-white hover:text-black text-white font-mono font-bold text-xs uppercase tracking-wider transition border border-white"
+              className="apple-button-secondary w-full sm:w-auto text-center text-xs"
             >
-              Store Info & Live Map
+              Store Info
             </Link>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Phone, ShieldCheck, ArrowRight, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, ArrowRight, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { ApiClient } from '../services/api.service';
 
 export const VerifyPage: React.FC = () => {
@@ -64,36 +64,36 @@ export const VerifyPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-12">
-      <div className="bg-[#161616] border border-[#2A2A2A] rounded-3xl p-6 sm:p-8 shadow-2xl relative">
-        <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-[#C91F32]/10 border border-[#C91F32]/30 text-[#C91F32] flex items-center justify-center mx-auto mb-4">
-            <ShieldCheck className="w-6 h-6" />
+    <div className="max-w-md mx-auto px-4 py-16">
+      <div className="apple-glass-card rounded-3xl p-6 sm:p-8 relative space-y-6">
+        <div className="text-center space-y-2">
+          <div className="w-10 h-10 rounded-full bg-[#0071E3]/10 text-[#0071E3] flex items-center justify-center mx-auto mb-2">
+            <ShieldCheck className="w-5 h-5" />
           </div>
-          <h2 className="text-2xl font-black font-display uppercase tracking-wide text-white">
-            {challengeId ? 'Enter Verification Code' : 'Verify Mobile Number'}
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
+            {challengeId ? 'Enter Code' : 'Verify Mobile'}
           </h2>
-          <p className="text-xs text-gray-400 mt-2">
+          <p className="text-xs text-[#86868B] max-w-xs mx-auto">
             {challengeId
-              ? `Code sent to ${maskedPhone}. Code valid for 5 minutes.`
-              : 'Enter your 10-digit Indian phone number to spin and claim monthly rewards.'}
+              ? `Verification code sent to ${maskedPhone}.`
+              : 'Enter your 10-digit phone number to spin and claim rewards.'}
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-3 rounded-xl bg-red-900/30 border border-red-800 text-xs text-red-200 flex items-start space-x-2">
-            <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+          <div className="p-3 rounded-2xl bg-[#FF453A]/10 border border-[#FF453A]/20 text-xs text-[#FF453A] flex items-start space-x-2">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
         {devMockOtp && (
-          <div className="mb-6 p-3 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/40 text-xs text-[#D4AF37] flex items-center justify-between">
-            <span>Dev Mock OTP Code: <strong>{devMockOtp}</strong></span>
+          <div className="p-3 rounded-2xl bg-[#0071E3]/10 border border-[#0071E3]/20 text-xs text-[#0071E3] flex items-center justify-between">
+            <span>Dev Mock Code: <strong>{devMockOtp}</strong></span>
             <button
               type="button"
               onClick={() => setOtp(devMockOtp)}
-              className="text-[11px] underline font-bold"
+              className="text-[11px] underline font-medium"
             >
               Auto Fill
             </button>
@@ -101,13 +101,13 @@ export const VerifyPage: React.FC = () => {
         )}
 
         {!challengeId ? (
-          <form onSubmit={handleRequestOtp} className="space-y-5">
+          <form onSubmit={handleRequestOtp} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
+              <label className="block text-xs font-medium text-[#86868B] mb-1.5">
                 Mobile Number
               </label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400 text-sm font-semibold">
+                <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-[#86868B] text-sm font-medium">
                   +91
                 </span>
                 <input
@@ -117,7 +117,7 @@ export const VerifyPage: React.FC = () => {
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   maxLength={14}
                   required
-                  className="w-full pl-14 pr-4 py-3 bg-[#111111] border border-[#2A2A2A] rounded-xl text-white placeholder-gray-500 text-sm focus:outline-none focus:border-[#C91F32] transition font-medium"
+                  className="w-full pl-14 pr-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white placeholder-[#86868B] text-sm focus:outline-none focus:border-[#0071E3] transition"
                 />
               </div>
             </div>
@@ -128,33 +128,33 @@ export const VerifyPage: React.FC = () => {
                 id="consent"
                 checked={marketingConsent}
                 onChange={(e) => setMarketingConsent(e.target.checked)}
-                className="mt-0.5 rounded border-[#2A2A2A] bg-[#111111] text-[#C91F32] focus:ring-0"
+                className="mt-0.5 rounded border-white/[0.1] bg-white/[0.04] text-[#0071E3] focus:ring-0"
               />
-              <label htmlFor="consent" className="text-[11px] text-gray-400 leading-tight">
-                (Optional) Receive WhatsApp updates and festive discount alerts from BINGOOO Men's Wear.
+              <label htmlFor="consent" className="text-[11px] text-[#86868B] leading-tight">
+                (Optional) Receive WhatsApp alerts for festive rewards & events.
               </label>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-[#C91F32] hover:bg-[#A81525] text-white font-bold text-sm uppercase tracking-wider transition shadow-lg shadow-[#C91F32]/30 flex items-center justify-center space-x-2 disabled:opacity-50"
+              className="apple-button-primary w-full flex items-center justify-center space-x-2 disabled:opacity-50"
             >
               {loading ? (
                 <RefreshCw className="w-4 h-4 animate-spin" />
               ) : (
                 <>
-                  <span>SEND OTP CODE</span>
+                  <span>Send Code</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
         ) : (
-          <form onSubmit={handleVerifyOtp} className="space-y-5">
+          <form onSubmit={handleVerifyOtp} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-300 mb-2">
-                6-Digit OTP Code
+              <label className="block text-xs font-medium text-[#86868B] mb-1.5 text-center">
+                6-Digit Verification Code
               </label>
               <input
                 type="text"
@@ -163,20 +163,20 @@ export const VerifyPage: React.FC = () => {
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 maxLength={6}
                 required
-                className="w-full px-4 py-3 bg-[#111111] border border-[#2A2A2A] rounded-xl text-white text-center text-2xl tracking-[0.3em] font-mono focus:outline-none focus:border-[#D4AF37] transition font-bold"
+                className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.08] rounded-xl text-white text-center text-2xl tracking-[0.3em] font-mono focus:outline-none focus:border-[#0071E3] transition font-bold"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading || otp.length < 6}
-              className="w-full py-3.5 rounded-xl bg-[#D4AF37] hover:bg-[#B8972E] text-[#111111] font-bold text-sm uppercase tracking-wider transition shadow-lg shadow-[#D4AF37]/20 flex items-center justify-center space-x-2 disabled:opacity-50"
+              className="apple-button-primary w-full flex items-center justify-center space-x-2 disabled:opacity-50"
             >
               {loading ? (
                 <RefreshCw className="w-4 h-4 animate-spin" />
               ) : (
                 <>
-                  <span>CONFIRM & PROCEED</span>
+                  <span>Confirm & Continue</span>
                   <CheckCircle2 className="w-4 h-4" />
                 </>
               )}
@@ -186,7 +186,7 @@ export const VerifyPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setChallengeId(null)}
-                className="text-gray-400 hover:text-white"
+                className="text-[#86868B] hover:text-white"
               >
                 Change Number
               </button>
@@ -194,7 +194,7 @@ export const VerifyPage: React.FC = () => {
                 type="button"
                 disabled={resendCooldown > 0 || loading}
                 onClick={handleRequestOtp}
-                className="text-[#C91F32] disabled:text-gray-500 font-semibold"
+                className="text-[#0071E3] disabled:text-[#86868B] font-medium"
               >
                 {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code'}
               </button>

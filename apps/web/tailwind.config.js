@@ -15,9 +15,9 @@ export default {
           border: '#282828',
           red: '#C91F32',
           redHover: '#B01828',
-          gold: '#F5B700', // Bauhaus primary yellow / gold
+          gold: '#F5B700',
           goldHover: '#DBA300',
-          blue: '#16428C', // Bauhaus cobalt accent
+          blue: '#16428C',
           cream: '#F7F5F0',
           muted: '#8E8E93',
         },
@@ -31,6 +31,20 @@ export default {
           border: '#333333',
           cream: '#F7F5F0',
           white: '#FFFFFF',
+        },
+        // SweetTape inspired tactile palette
+        tape: {
+          lime: '#B6FE00',
+          limeHover: '#A4E800',
+          forest: '#013900',
+          forestDark: '#034102',
+          cream: '#FDFBE8',
+          butter: '#FFF1A2',
+          yellow: '#FCD805',
+          orange: '#FF7E00',
+          ink: '#16110A',
+          kraft: '#EBE4CC',
+          kraftDark: '#DED7B5',
         }
       },
       boxShadow: {
@@ -39,11 +53,18 @@ export default {
         'bauhaus-white': '4px 4px 0px 0px #FFFFFF',
         'bauhaus-dark': '4px 4px 0px 0px #000000',
         'bauhaus-blue': '4px 4px 0px 0px #16428C',
+        'tape': '3px 3px 0px 0px #16110A',
+        'tape-lg': '6px 6px 0px 0px #16110A',
+        'tape-lime': '4px 4px 0px 0px #B6FE00',
+        'tape-yellow': '4px 4px 0px 0px #FCD805',
+        'tape-peel': '0 8px 16px -4px rgba(22, 17, 10, 0.35), 4px 4px 0px 0px #16110A',
       },
       fontFamily: {
         sans: ['"Outfit"', '"Plus Jakarta Sans"', 'sans-serif'],
         display: ['"Space Grotesk"', 'sans-serif'],
         mono: ['"Space Mono"', 'monospace'],
+        condensed: ['"Bebas Neue"', '"Impact"', '"Arial Narrow"', 'sans-serif'],
+        hand: ['"Nothing You Could Do"', '"Caveat"', 'cursive'],
       }
     },
   },

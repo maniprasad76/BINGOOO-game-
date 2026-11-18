@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Clock, ShieldCheck, ArrowUpRight, Sparkles } from 'lucide-react';
+import { MapPin, Clock, ShieldCheck, ArrowUpRight, Sparkles, Instagram } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   // Typography style options so user can switch between styles
@@ -58,16 +58,23 @@ export const Footer: React.FC = () => {
             <p className="text-xs text-[#86868B] leading-relaxed max-w-sm">
               Srikakulam's premier destination for contemporary men's fashion. Premium oversized t-shirts, cuban collar shirts, selvedge denim, and structured trousers.
             </p>
-            <div className="pt-1">
+            <div className="pt-1 flex flex-wrap gap-2">
               <a
                 href="https://www.bingooo.co.in"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center space-x-1.5 text-xs text-white bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] px-3.5 py-1.5 rounded-full transition"
               >
-                <span>Visit bingooo.co.in</span>
+                <span>bingooo.co.in</span>
                 <ArrowUpRight className="w-3.5 h-3.5 text-[#86868B]" />
               </a>
+              <Link
+                to="/instagram"
+                className="inline-flex items-center space-x-1.5 text-xs text-white bg-gradient-to-r from-[#FD1D1D]/20 via-[#E1306C]/20 to-[#833AB4]/20 hover:from-[#FD1D1D]/30 hover:to-[#833AB4]/30 border border-[#E1306C]/30 px-3.5 py-1.5 rounded-full transition"
+              >
+                <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
+                <span>@bingooo.co.in Reels</span>
+              </Link>
             </div>
           </div>
 
@@ -101,6 +108,12 @@ export const Footer: React.FC = () => {
               <li>
                 <Link to="/rewards" className="hover:text-white transition">
                   My Vouchers
+                </Link>
+              </li>
+              <li>
+                <Link to="/instagram" className="hover:text-white transition flex items-center space-x-1.5 text-[#E1306C]">
+                  <Instagram className="w-3.5 h-3.5" />
+                  <span>Instagram Reels & Drops</span>
                 </Link>
               </li>
               <li>

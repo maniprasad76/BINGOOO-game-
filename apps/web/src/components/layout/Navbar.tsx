@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Sparkles, Gift, LogOut, User, Menu, X, ArrowUpRight } from 'lucide-react';
+import { Sparkles, Gift, LogOut, User, Menu, X, ArrowUpRight, Instagram } from 'lucide-react';
 import { CelestialEmblem } from './CelestialEmblem';
 
 export const Navbar: React.FC = () => {
@@ -87,6 +87,17 @@ export const Navbar: React.FC = () => {
             }`}
           >
             Store
+          </Link>
+          <Link
+            to="/instagram"
+            className={`transition-colors py-1 flex items-center space-x-1 ${
+              isActive('/instagram')
+                ? 'text-white font-semibold'
+                : 'text-[#86868B] hover:text-[#F5F5F7]'
+            }`}
+          >
+            <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
+            <span>Reels</span>
           </Link>
         </nav>
 
@@ -184,6 +195,19 @@ export const Navbar: React.FC = () => {
             >
               <span>Store Location & Hours</span>
               <span className="text-xs text-[#86868B]">Srikakulam</span>
+            </Link>
+            <Link
+              to="/instagram"
+              onClick={closeMenu}
+              className={`py-2.5 text-base font-medium flex items-center justify-between border-b border-white/[0.04] ${
+                isActive('/instagram') ? 'text-white font-semibold' : 'text-[#86868B]'
+              }`}
+            >
+              <span className="flex items-center space-x-2">
+                <Instagram className="w-4 h-4 text-[#E1306C]" />
+                <span>Instagram Reels</span>
+              </span>
+              <span className="text-xs text-[#0071E3]">@bingooo.co.in</span>
             </Link>
             <a
               href="https://www.bingooo.co.in"

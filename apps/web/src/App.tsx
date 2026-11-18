@@ -15,6 +15,7 @@ import { RewardsPage } from './pages/RewardsPage';
 import { RewardDetailPage } from './pages/RewardDetailPage';
 import { HowItWorksPage } from './pages/HowItWorksPage';
 import { ContactPage } from './pages/ContactPage';
+import { InstagramPage } from './pages/InstagramPage';
 import { TermsPage, PrivacyPage } from './pages/LegalPages';
 import { SupabaseTodosPage } from './pages/SupabaseTodosPage';
 import { AdminLoginPage } from './admin/AdminLoginPage';
@@ -71,6 +72,8 @@ export const App: React.FC = () => {
                     <Route path="/reward/:code" element={<RewardDetailPage />} />
                     <Route path="/how-it-works" element={<HowItWorksPage />} />
                     <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/instagram" element={<InstagramPage />} />
+                    <Route path="/reels" element={<InstagramPage />} />
                     <Route path="/terms" element={<TermsPage />} />
                     <Route path="/privacy" element={<PrivacyPage />} />
                     <Route path="/todos" element={<SupabaseTodosPage />} />

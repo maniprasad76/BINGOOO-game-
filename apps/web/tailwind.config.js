@@ -60,11 +60,12 @@ export default {
         'tape-peel': '0 8px 16px -4px rgba(22, 17, 10, 0.35), 4px 4px 0px 0px #16110A',
       },
       fontFamily: {
-        sans: ['"Outfit"', '"Plus Jakarta Sans"', 'sans-serif'],
-        display: ['"Space Grotesk"', 'sans-serif'],
-        mono: ['"Space Mono"', 'monospace'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Inter"', '"Plus Jakarta Sans"', 'sans-serif'],
+        display: ['"Montserrat"', '-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Inter"', 'sans-serif'],
+        apple: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Inter"', 'sans-serif'],
+        montserrat: ['"Montserrat"', 'sans-serif'],
+        syne: ['"Syne"', 'sans-serif'],
         condensed: ['"Bebas Neue"', '"Impact"', '"Arial Narrow"', 'sans-serif'],
-        hand: ['"Nothing You Could Do"', '"Caveat"', 'cursive'],
       }
     },
   },

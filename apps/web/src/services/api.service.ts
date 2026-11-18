@@ -322,4 +322,20 @@ export class ApiClient {
     localStorage.removeItem('bingooo_admin_token');
     localStorage.removeItem('bingooo_admin_user');
   }
+
+  // Instagram Dynamic Reels Feed
+  static async getInstagramReels() {
+    return this.request('/instagram/reels');
+  }
+
+  static async syncInstagramReels() {
+    return this.request('/instagram/sync', { method: 'POST' });
+  }
+
+  static async addInstagramReel(data: { url: string; title?: string; caption?: string; badge?: string }) {
+    return this.request('/instagram/reels', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
 }

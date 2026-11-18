@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   MapPin,
@@ -12,8 +12,10 @@ import {
   Volume2,
   VolumeX,
   X,
-  ExternalLink
+  ExternalLink,
+  RefreshCw
 } from 'lucide-react';
+import { ApiClient } from '../../services/api.service';
 
 interface ReelPreview {
   id: string;
@@ -32,8 +34,8 @@ export const Footer: React.FC = () => {
   const [selectedReel, setSelectedReel] = useState<ReelPreview | null>(null);
   const [activeBounce, setActiveBounce] = useState<number | null>(null);
 
-  // Exact authentic reels from official @bingooo.co.in Instagram
-  const reels: ReelPreview[] = [
+  // Default verified reels from official @bingooo.co.in Instagram
+  const initialReels: ReelPreview[] = [
     {
       id: 'Dfj8UqKTPX5',
       title: 'Navvukondiii 😂😂',
@@ -83,6 +85,28 @@ export const Footer: React.FC = () => {
       url: 'https://www.instagram.com/reel/DfQsPKiTAhN/'
     }
   ];
+
+  const [reels, setReels] = useState<ReelPreview[]>(initialReels);
+
+  // Dynamic live fetch from backend API
+  useEffect(() => {
+    let isMounted = true;
+    ApiClient.getInstagramReels()
+      .then((res: any) => {
+        if (isMounted && res?.data && Array.isArray(res.data) && res.data.length > 0) {
+          // Take top 4 for the footer showcase
+          setReels(res.data.slice(0, 4));
+        }
+      })
+      .catch((err) => {
+        // Fallback to initialReels silently
+        console.debug('Using cached Instagram reels feed', err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const letters = ['B', 'I', 'N', 'G', 'O', 'O', 'O'];
 

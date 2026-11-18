@@ -11,6 +11,7 @@ import { ReferralsModule } from './referrals/referrals.module';
 import { StoreQrModule } from './store-qr/store-qr.module';
 import { BirthdaysModule } from './birthdays/birthdays.module';
 import { PurchasesModule } from './purchases/purchases.module';
+import { InstagramModule } from './instagram/instagram.module';
 
 @Module({
   imports: [
@@ -33,7 +34,8 @@ import { PurchasesModule } from './purchases/purchases.module';
     ReferralsModule,
     StoreQrModule,
     BirthdaysModule,
-    PurchasesModule
+    PurchasesModule,
+    InstagramModule
   ]
 })
 export class AppModule {}

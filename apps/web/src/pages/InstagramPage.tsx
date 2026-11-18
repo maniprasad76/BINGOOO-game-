@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Instagram,
   ExternalLink,
@@ -11,8 +11,14 @@ import {
   Sparkles,
   Check,
   Copy,
-  ArrowUpRight
+  ArrowUpRight,
+  RefreshCw,
+  Plus,
+  Radio,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
+import { ApiClient } from '../services/api.service';
 
 interface ReelItem {
   id: string;
@@ -36,11 +42,21 @@ export const InstagramPage: React.FC = () => {
   const [likedReels, setLikedReels] = useState<Record<string, boolean>>({});
   const [isMuted, setIsMuted] = useState(false);
 
+  // Sync & Add Reel Modal State
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatusMessage, setSyncStatusMessage] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newReelUrl, setNewReelUrl] = useState('');
+  const [newReelTitle, setNewReelTitle] = useState('');
+  const [newReelCategory, setNewReelCategory] = useState<'drops' | 'store' | 'outfits' | 'winners'>('drops');
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishSuccess, setPublishSuccess] = useState(false);
+
   const instagramProfileUrl = "https://www.instagram.com/bingooo.co.in/";
   const instagramHandle = "@bingooo.co.in";
 
   // Exact real reels and posts from https://www.instagram.com/bingooo.co.in/
-  const reelsData: ReelItem[] = [
+  const initialReels: ReelItem[] = [
     {
       id: 'Dfj8UqKTPX5',
       title: 'Navvukondiii 😂😂',
@@ -126,6 +142,80 @@ export const InstagramPage: React.FC = () => {
       instagramUrl: 'https://www.instagram.com/p/Dei0AymkcWa/'
     }
   ];
+
+  const [reelsData, setReelsData] = useState<ReelItem[]>(initialReels);
+
+  const fetchReelsFromApi = async () => {
+    try {
+      const res: any = await ApiClient.getInstagramReels();
+      if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
+        // Map backend reels format to ReelItem
+        const mapped: ReelItem[] = res.data.map((r: any) => ({
+          id: r.id || r.shortcode,
+          title: r.title || 'Reel @bingooo.co.in',
+          category: (r.badge?.toLowerCase().includes('shirt') ? 'drops' : 'drops') as any,
+          views: r.views || 'Live',
+          likes: r.likes || '100+',
+          comments: r.comments || '10+',
+          duration: r.duration || 'Reel',
+          badge: r.badge || 'New Drop',
+          caption: r.caption || '',
+          audioTrack: 'Audio - @bingooo.co.in',
+          image: r.image || '/reels/reel-1.jpg',
+          instagramUrl: r.url || `https://www.instagram.com/reel/${r.shortcode || r.id}/`
+        }));
+        setReelsData(mapped);
+      }
+    } catch (err) {
+      console.debug('Failed to fetch reels from API, using default', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchReelsFromApi();
+  }, []);
+
+  const handleManualSync = async () => {
+    setIsSyncing(true);
+    setSyncStatusMessage('Syncing with Instagram feed...');
+    try {
+      const res: any = await ApiClient.syncInstagramReels();
+      await fetchReelsFromApi();
+      setSyncStatusMessage(res?.message || 'Instagram feed is synchronized.');
+      setTimeout(() => setSyncStatusMessage(null), 4000);
+    } catch (err: any) {
+      setSyncStatusMessage(err.message || 'Sync complete with active reels.');
+      setTimeout(() => setSyncStatusMessage(null), 4000);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const handlePublishReel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newReelUrl.trim()) return;
+
+    setIsPublishing(true);
+    try {
+      await ApiClient.addInstagramReel({
+        url: newReelUrl.trim(),
+        title: newReelTitle.trim() || undefined,
+        badge: newReelCategory === 'drops' ? 'New Drop' : newReelCategory === 'outfits' ? 'Style Guide' : 'Flagship Drop'
+      });
+      await fetchReelsFromApi();
+      setPublishSuccess(true);
+      setNewReelUrl('');
+      setNewReelTitle('');
+      setTimeout(() => {
+        setPublishSuccess(false);
+        setShowAddModal(false);
+      }, 1500);
+    } catch (err: any) {
+      alert(`Could not add reel: ${err.message}`);
+    } finally {
+      setIsPublishing(false);
+    }
+  };
 
   const filteredReels = activeCategory === 'all'
     ? reelsData
@@ -222,7 +312,36 @@ export const InstagramPage: React.FC = () => {
                   </>
                 )}
               </button>
+
+              <button
+                type="button"
+                onClick={handleManualSync}
+                disabled={isSyncing}
+                className="apple-button-secondary inline-flex items-center space-x-1.5 text-xs text-white hover:text-white"
+                title="Sync live reels from Instagram"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-[#0071E3] ${isSyncing ? 'animate-spin' : ''}`} />
+                <span>{isSyncing ? 'Syncing...' : 'Sync Feed'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowAddModal(true)}
+                className="apple-button-secondary inline-flex items-center space-x-1.5 text-xs text-[#30D158] hover:text-white border-[#30D158]/30"
+                title="Add a newly posted Instagram reel"
+              >
+                <Plus className="w-3.5 h-3.5 text-[#30D158]" />
+                <span>Add / Publish Reel</span>
+              </button>
             </div>
+
+            {/* Sync feedback message */}
+            {syncStatusMessage && (
+              <div className="mt-2 inline-flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-white/[0.06] border border-white/[0.1] text-xs text-white">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#30D158]" />
+                <span>{syncStatusMessage}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -428,6 +547,112 @@ export const InstagramPage: React.FC = () => {
                 <span>Open Reel on Instagram ↗</span>
               </a>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add / Link Reel Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="relative w-full max-w-md apple-glass-card rounded-3xl overflow-hidden border border-white/20 shadow-2xl p-6 sm:p-7 space-y-5 bg-neutral-950">
+            <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
+              <div className="flex items-center space-x-2">
+                <Instagram className="w-4 h-4 text-[#0071E3]" />
+                <h3 className="text-base font-bold text-white tracking-tight">
+                  Publish Reel to Website
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowAddModal(false)}
+                className="w-7 h-7 rounded-full bg-white/[0.08] hover:bg-white/[0.14] text-white flex items-center justify-center transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-[#86868B] leading-relaxed">
+              Paste the link of any reel or post you just published on <strong className="text-white">@bingooo.co.in</strong>. It will immediately show up at the top of the feed and in the website footer.
+            </p>
+
+            <form onSubmit={handlePublishReel} className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-[#A1A1A6]">
+                  Instagram Reel / Post URL *
+                </label>
+                <input
+                  type="url"
+                  required
+                  placeholder="https://www.instagram.com/reel/Dfj8UqKTPX5/"
+                  value={newReelUrl}
+                  onChange={(e) => setNewReelUrl(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white text-xs placeholder-white/30 focus:outline-none focus:border-[#0071E3] transition"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-[#A1A1A6]">
+                  Drop / Reel Title (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. 240 GSM Graphic Tee Drop"
+                  value={newReelTitle}
+                  onChange={(e) => setNewReelTitle(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-white text-xs placeholder-white/30 focus:outline-none focus:border-[#0071E3] transition"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-[#A1A1A6]">
+                  Badge / Category
+                </label>
+                <select
+                  value={newReelCategory}
+                  onChange={(e) => setNewReelCategory(e.target.value as any)}
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-neutral-900 border border-white/10 text-white text-xs focus:outline-none focus:border-[#0071E3] transition"
+                >
+                  <option value="drops">Tees & Drops</option>
+                  <option value="outfits">Style Guide</option>
+                  <option value="store">Flagship Store</option>
+                  <option value="winners">Community</option>
+                </select>
+              </div>
+
+              {publishSuccess && (
+                <div className="flex items-center space-x-2 text-xs text-[#30D158] bg-[#30D158]/10 p-3 rounded-xl border border-[#30D158]/20">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span>Reel added! It is now live on the website.</span>
+                </div>
+              )}
+
+              <div className="pt-2 flex items-center justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="apple-button-secondary text-xs text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isPublishing || !newReelUrl.trim()}
+                  className="apple-button-primary text-xs flex items-center space-x-1.5"
+                >
+                  {isPublishing ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Publishing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Publish to Website</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -9,32 +9,43 @@ import {
   Cake,
   Ticket,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  MapPin,
+  Star
 } from 'lucide-react';
 import { ApiClient } from '../../services/api.service';
+import { GoogleReviewModal } from '../../components/loyalty/GoogleReviewModal';
 
 export const RewardsClubHubPage: React.FC = () => {
   const [wallet, setWallet] = useState<any>(null);
   const [refSummary, setRefSummary] = useState<any>(null);
   const [bdayStatus, setBdayStatus] = useState<any>(null);
   const [spinElig, setSpinElig] = useState<any>(null);
+  const [googleReviewStatus, setGoogleReviewStatus] = useState<any>(null);
+  const [googleReviewModalOpen, setGoogleReviewModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadData = () => {
     Promise.all([
       ApiClient.getLoyaltyWallet(),
       ApiClient.getReferralSummary(),
       ApiClient.getBirthdayEligibility(),
-      ApiClient.checkEligibility()
+      ApiClient.checkEligibility(),
+      ApiClient.getGoogleReviewStatus().catch(() => null)
     ])
-      .then(([w, r, b, s]) => {
+      .then(([w, r, b, s, g]) => {
         setWallet(w);
         setRefSummary(r);
         setBdayStatus(b);
         setSpinElig(s);
+        setGoogleReviewStatus(g);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadData();
   }, []);
 
   return (
@@ -250,7 +261,44 @@ export const RewardsClubHubPage: React.FC = () => {
             </div>
           </Link>
 
-          {/* Tile 6: My Vouchers */}
+          {/* Tile 6: Google Maps Review Bonus */}
+          <div
+            onClick={() => setGoogleReviewModalOpen(true)}
+            className="apple-glass-card rounded-2xl p-6 hover:border-white/20 transition-all duration-300 group flex flex-col justify-between space-y-4 cursor-pointer"
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-[#EA4335]/10 text-[#EA4335] flex items-center justify-center">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                  googleReviewStatus?.claimed
+                    ? 'bg-[#30D158]/10 text-[#30D158]'
+                    : 'bg-[#EA4335]/15 text-[#EA4335] font-semibold'
+                }`}>
+                  {googleReviewStatus?.claimed ? 'Claimed ✓' : '+75 Coins'}
+                </span>
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-white tracking-tight group-hover:text-white transition flex items-center gap-1.5">
+                  <span>Google Maps Review</span>
+                  <div className="flex items-center space-x-0.5">
+                    <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                    <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                  </div>
+                </h3>
+                <p className="text-xs text-[#86868B] mt-1.5 leading-relaxed">
+                  Review BINGOOO Men's Wear on Google Maps. Earn 75 instant Coins to convert into store discount vouchers.
+                </p>
+              </div>
+            </div>
+            <div className="pt-2 text-xs font-medium text-[#EA4335] flex items-center space-x-1">
+              <span>{googleReviewStatus?.claimed ? 'View review status' : 'Write review & claim 75 Coins'}</span>
+              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+
+          {/* Tile 7: My Vouchers */}
           <Link
             to="/rewards"
             className="apple-glass-card rounded-2xl p-6 hover:border-white/20 transition-all duration-300 group flex flex-col justify-between space-y-4"
@@ -280,6 +328,17 @@ export const RewardsClubHubPage: React.FC = () => {
           </Link>
         </div>
       </div>
+
+      {/* Google Maps Review Modal */}
+      <GoogleReviewModal
+        isOpen={googleReviewModalOpen}
+        onClose={() => setGoogleReviewModalOpen(false)}
+        isAlreadyClaimed={googleReviewStatus?.claimed}
+        onCoinsClaimed={(newBalance) => {
+          setGoogleReviewStatus({ claimed: true, coinsEarned: 75 });
+          setWallet((prev: any) => ({ ...prev, availableBalance: newBalance }));
+        }}
+      />
     </div>
   );
 };

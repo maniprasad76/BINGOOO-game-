@@ -12,10 +12,12 @@ import {
   Copy,
   Instagram,
   Check,
-  ExternalLink
+  ExternalLink,
+  Star
 } from 'lucide-react';
 import { SpinWheel } from '../components/wheel/SpinWheel';
 import { InstagramFollowGateModal } from '../components/wheel/InstagramFollowGateModal';
+import { GoogleReviewModal } from '../components/loyalty/GoogleReviewModal';
 import { ApiClient } from '../services/api.service';
 
 export const SpinPage: React.FC = () => {
@@ -27,6 +29,7 @@ export const SpinPage: React.FC = () => {
   const [spinResult, setSpinResult] = useState<any>(null);
   const [copied, setCopied] = useState(false);
   const [countdown, setCountdown] = useState<string>('');
+  const [googleReviewModalOpen, setGoogleReviewModalOpen] = useState(false);
 
   // Mandatory Instagram Follow Gate
   const [isInstagramFollowed, setIsInstagramFollowed] = useState<boolean>(() => {
@@ -159,6 +162,18 @@ export const SpinPage: React.FC = () => {
               </Link>
             </div>
           )}
+
+          {/* Google Review Bonus Nudge */}
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => setGoogleReviewModalOpen(true)}
+              className="inline-flex items-center space-x-2 text-xs text-amber-400 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] px-3.5 py-2 rounded-xl border border-white/10 transition"
+            >
+              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+              <span>Review BINGOOO on Google Maps to earn +75 Coins →</span>
+            </button>
+          </div>
         </div>
       )}
 
@@ -355,6 +370,12 @@ export const SpinPage: React.FC = () => {
         isOpen={showInstagramGateModal}
         onClose={() => setShowInstagramGateModal(false)}
         onVerified={handleInstagramVerified}
+      />
+
+      {/* Google Maps Review Modal */}
+      <GoogleReviewModal
+        isOpen={googleReviewModalOpen}
+        onClose={() => setGoogleReviewModalOpen(false)}
       />
     </div>
   );

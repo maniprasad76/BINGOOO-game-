@@ -151,6 +151,18 @@ export class ApiClient {
     });
   }
 
+  // Google Maps Review Rewards
+  static async getGoogleReviewStatus() {
+    return this.request('/loyalty/google-review/status');
+  }
+
+  static async claimGoogleReview(reviewerName?: string) {
+    return this.request('/loyalty/google-review/claim', {
+      method: 'POST',
+      body: JSON.stringify({ reviewerName })
+    });
+  }
+
   // Module 3: Refer & Earn
   static async getReferralCode() {
     return this.request('/referrals/my-code');

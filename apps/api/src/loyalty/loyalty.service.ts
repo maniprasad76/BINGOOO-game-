@@ -217,4 +217,62 @@ export class LoyaltyService {
       };
     });
   }
+
+  /**
+   * Check if customer has already claimed Google Maps review reward
+   */
+  async checkGoogleReviewStatus(customerId: string) {
+    const entry = await this.prisma.loyaltyLedgerEntry.findFirst({
+      where: {
+        customerId,
+        sourceType: 'GOOGLE_REVIEW'
+      }
+    });
+
+    return {
+      claimed: !!entry,
+      claimedAt: entry?.occurredAt?.toISOString() || null,
+      coinsEarned: entry?.amount || 0,
+      rewardAmount: 75,
+      googleReviewUrl: 'https://maps.app.goo.gl/4V5n1LzD3XQ7Z7qTA' // Or https://search.google.com/local/writereview
+    };
+  }
+
+  /**
+   * Claim Google Maps 5-Star Review reward coins
+   */
+  async claimGoogleReviewReward(customerId: string, reviewerName?: string) {
+    const existing = await this.prisma.loyaltyLedgerEntry.findFirst({
+      where: {
+        customerId,
+        sourceType: 'GOOGLE_REVIEW'
+      }
+    });
+
+    if (existing) {
+      throw new BadRequestException('You have already claimed your Google Maps review bonus coins.');
+    }
+
+    const coinsReward = 75;
+    const account = await this.getOrCreateAccount(customerId);
+
+    await this.awardCoins(
+      customerId,
+      coinsReward,
+      LoyaltyTransactionType.BONUS,
+      'GOOGLE_REVIEW',
+      account.id,
+      `google_review_${customerId}`,
+      reviewerName ? `Google Maps 5-Star Review (${reviewerName})` : 'Google Maps Review Bonus'
+    );
+
+    const wallet = await this.getWallet(customerId);
+
+    return {
+      success: true,
+      coinsAwarded: coinsReward,
+      newBalance: wallet.availableBalance,
+      message: `🎉 Success! ${coinsReward} BINGOOO Coins added to your wallet for reviewing us on Google Maps.`
+    };
+  }
 }

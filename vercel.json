@@ -1,0 +1,10 @@
+{
+  "buildCommand": "npm run build --workspace=@bingooo/shared && npm run build --workspace=@bingooo/web",
+  "outputDirectory": "apps/web/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
